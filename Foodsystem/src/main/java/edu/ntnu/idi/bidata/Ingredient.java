@@ -7,8 +7,8 @@ import java.time.LocalDate;
  */
 public class Ingredient {
   private final String name;
-  private final int numberOfItems;
   private final String unit;
+  private final int numberOfItems;
   private final double price;
   private final LocalDate expirationDate;
 
@@ -16,15 +16,16 @@ public class Ingredient {
    * Constructor for Ingredient. makes it possible to create an ingredient object.
    *
    * @param name name of food.
-   * @param numberOfItems number of items.
    * @param unit unit of measurement.
+   * @param numberOfItems number of items.
+   *
    * @param price price of food.
    * @param expirationDate expiration date of food.
    */
   public Ingredient(
       String name,
-      int numberOfItems,
       String unit,
+      int numberOfItems,
       double price,
       LocalDate expirationDate) {
 
@@ -40,8 +41,8 @@ public class Ingredient {
     //an override toString method where we convert from object to string
     return "Ingredient{"
             + "name='" + name + '\''
-            + ", numberOfItems=" + numberOfItems
             + ", unit='" + unit + '\''
+            + ", numberOfItems=" + numberOfItems
             + ", price=" + price
             + ", expirationDate=" + expirationDate
             + '}';

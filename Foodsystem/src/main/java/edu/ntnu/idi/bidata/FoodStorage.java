@@ -46,10 +46,10 @@ public class FoodStorage {
    * @param filename the name of the file to which the ingredients will be written.
    */
   public void saveIngredientsToFile(String filename) {
-    String path = "idatt1003-mappe-2024-Viet-Uy/Foodsystem/src/main/java/edu/ntnu/idi/bidata/";
-    String filePath = path + filename;
+//    String path = "idatt1003-mappe-2024-Viet-Uy/Foodsystem/src/main/java/edu/ntnu/idi/bidata/";
+//    String filePath = path + filename;
 
-    try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+    try (PrintWriter writer = new PrintWriter(new FileWriter(filename, true))) {
       for (Ingredient ingredient : ingredients) {
         // Write the ingredient to the file as a string.
         writer.println(ingredient.toString());
@@ -74,7 +74,7 @@ public class FoodStorage {
         String unit = parts[2];
         double price = Double.parseDouble(parts[3]);
         LocalDate expirationDate = LocalDate.parse(parts[4]);
-        Ingredient ingredient = new Ingredient(name, numberOfItems, unit, price, expirationDate);
+        Ingredient ingredient = new Ingredient(name, unit, numberOfItems, price, expirationDate);
         ingredients.add(ingredient);
       }
     } catch (IOException e) {
