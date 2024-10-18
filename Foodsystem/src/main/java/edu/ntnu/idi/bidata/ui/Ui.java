@@ -10,14 +10,24 @@ import java.util.Scanner;
  * Console user interface for the food system.
  */
 public class Ui {
+  private FoodStorage foodStorage;
+  private Scanner scanner;
+
+
   /**
-     * Main method for terminal user interface.
-    *
-     * @param args the command line arguments.
-     */
-  public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in); // Scanner to read input from the user
-    FoodStorage foodStorage = new FoodStorage();
+   * Main method for terminal user interface.
+   */
+  public void init() {
+    scanner = new Scanner(System.in); // Scanner to read input from the user
+    foodStorage = new FoodStorage();
+    System.out.println("Welcome to the Food Storage System!");
+    //System.out.println("Initialization complete. Ingredients loaded from file.");
+  }
+
+  /**
+   * Start the user interface.
+   */
+  public void start() {
     String choices = "\n1:Add ingredient\n2:Remove ingredient\n3:Show all ingredients\n4:Exit";
     System.out.println("What do you want to do?" + choices);
     int choice = scanner.nextInt();
@@ -55,6 +65,7 @@ public class Ui {
         break;
       case 3:
         System.out.println("Showing all ingredients");
+        foodStorage.loadIngredientsFromFile("ingredients.txt");
         break;
       case 4:
         System.out.println("Exiting");
@@ -62,5 +73,17 @@ public class Ui {
       default:
         System.out.println("Invalid choice");
     }
+  }
+
+  /**
+     * Main method for terminal user interface.
+    *
+     * @param args the command line arguments.
+     */
+  public static void main(String[] args) {
+
+    Ui ui = new Ui();
+    ui.init();
+    ui.start();
   }
 }
