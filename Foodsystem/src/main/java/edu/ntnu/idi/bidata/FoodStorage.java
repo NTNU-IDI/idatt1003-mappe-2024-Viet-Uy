@@ -68,7 +68,6 @@ public class FoodStorage {
     try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
       String line;
       while ((line = reader.readLine()) != null) {
-<<<<<<< Updated upstream
         String[] parts = line.split(",");
         String name = parts[0];
         int numberOfItems = Integer.parseInt(parts[1]);
@@ -77,22 +76,6 @@ public class FoodStorage {
         LocalDate expirationDate = LocalDate.parse(parts[4]);
         Ingredient ingredient = new Ingredient(name, unit, numberOfItems, price, expirationDate);
         ingredients.add(ingredient);
-=======
-        Matcher matcher = pattern.matcher(line);
-        if (matcher.find()) {
-          String name = matcher.group(1);
-          int numberOfItems = Integer.parseInt(matcher.group(2));
-          String unit = matcher.group(3);
-          double price = Double.parseDouble(matcher.group(4));
-          LocalDate expirationDate = LocalDate.parse(matcher.group(5));
-
-          Ingredient ingredient = new Ingredient(name,unit, numberOfItems, price, expirationDate);
-          ingredients.add(ingredient);
-
-          System.out.printf("%-20s %-20d %-10s %-10.2f %-15s%n",
-              name, numberOfItems, unit, price, expirationDate);
-        }
->>>>>>> Stashed changes
       }
     } catch (IOException e) {
       // If the file does not exist, then it will throw an error.
