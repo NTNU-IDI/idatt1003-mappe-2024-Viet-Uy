@@ -1,3 +1,0 @@
-Ingredient{name='Kiwi', numberOfItems=10, unit='kg', price=19.0, expirationDate=2024-10-12}
-Ingredient{name='Ananas', numberOfItems=10, unit='kg', price=21.0, expirationDate=2019-09-09}
-Ingredient{name='Eple', numberOfItems=19, unit='kg', price=20.0, expirationDate=2020-06-07}

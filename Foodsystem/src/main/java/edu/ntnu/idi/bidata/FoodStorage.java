@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Class for storing food ingredients.
@@ -41,7 +39,6 @@ public class FoodStorage {
   }
 
 
-
   /**
    * Saves ingredients to a file. Writes line by line; if the file already exists
    * it appends the new elements. Otherwise, it creates a new file in the given directory.
@@ -49,10 +46,10 @@ public class FoodStorage {
    * @param filename the name of the file to which the ingredients will be written.
    */
   public void saveIngredientsToFile(String filename) {
-    String path = "idatt1003-mappe-2024-Viet-Uy/Foodsystem/src/main/java/edu/ntnu/idi/bidata/";
-    String filePath = path + filename;
+//    String path = "idatt1003-mappe-2024-Viet-Uy/Foodsystem/src/main/java/edu/ntnu/idi/bidata/";
+//    String filePath = path + filename;
 
-    try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+    try (PrintWriter writer = new PrintWriter(new FileWriter(filename, true))) {
       for (Ingredient ingredient : ingredients) {
         // Write the ingredient to the file as a string.
         writer.println(ingredient.toString());
@@ -68,15 +65,19 @@ public class FoodStorage {
    * @param filename the name of the file you want to load ingredients from.
    */
   public void loadIngredientsFromFile(String filename) {
-    String path = "idatt1003-mappe-2024-Viet-Uy/Foodsystem/src/main/java/edu/ntnu/idi/bidata/";
-    String filePath = path + filename;
-    String regex = "name='(.*?)', numberOfItems=(\\d+), unit='(.*?)', price=(\\d+\\.\\d+),"
-                  + " expirationDate=(\\d{4}-\\d{2}-\\d{2})";
-    Pattern pattern = Pattern.compile(regex);
-
-    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
       String line;
       while ((line = reader.readLine()) != null) {
+<<<<<<< Updated upstream
+        String[] parts = line.split(",");
+        String name = parts[0];
+        int numberOfItems = Integer.parseInt(parts[1]);
+        String unit = parts[2];
+        double price = Double.parseDouble(parts[3]);
+        LocalDate expirationDate = LocalDate.parse(parts[4]);
+        Ingredient ingredient = new Ingredient(name, unit, numberOfItems, price, expirationDate);
+        ingredients.add(ingredient);
+=======
         Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
           String name = matcher.group(1);
@@ -85,14 +86,16 @@ public class FoodStorage {
           double price = Double.parseDouble(matcher.group(4));
           LocalDate expirationDate = LocalDate.parse(matcher.group(5));
 
-          Ingredient ingredient = new Ingredient(name, numberOfItems, unit, price, expirationDate);
+          Ingredient ingredient = new Ingredient(name,unit, numberOfItems, price, expirationDate);
           ingredients.add(ingredient);
 
           System.out.printf("%-20s %-20d %-10s %-10.2f %-15s%n",
               name, numberOfItems, unit, price, expirationDate);
         }
+>>>>>>> Stashed changes
       }
     } catch (IOException e) {
+      // If the file does not exist, then it will throw an error.
       logger.log(Level.SEVERE, "Could not load ingredients from file", e);
     }
   }

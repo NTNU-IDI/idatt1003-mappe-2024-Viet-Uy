@@ -10,24 +10,17 @@ import java.util.Scanner;
  * Console user interface for the food system.
  */
 public class Ui {
-  private FoodStorage foodStorage;
-  private Scanner scanner;
-
 
   /**
-   * Main method for terminal user interface.
-   */
-  public void init() {
-    scanner = new Scanner(System.in); // Scanner to read input from the user
-    foodStorage = new FoodStorage();
-    System.out.println("Welcome to the Food Storage System!");
-    //System.out.println("Initialization complete. Ingredients loaded from file.");
-  }
-
-  /**
-   * Start the user interface.
-   */
-  public void start() {
+     * Main method for terminal user interface.
+    *
+     * @param args the command line arguments.
+     */
+  public static void main(String[] args) {
+    String currentDir = System.getProperty("user.dir");
+    System.out.println("Current working directory: " + currentDir);
+    Scanner scanner = new Scanner(System.in); // Scanner to read input from the user
+    FoodStorage foodStorage = new FoodStorage();
     String choices = "\n1:Add ingredient\n2:Remove ingredient\n3:Show all ingredients\n4:Exit";
     System.out.println("What do you want to do?" + choices);
     int choice = scanner.nextInt();
@@ -35,16 +28,50 @@ public class Ui {
     switch (choice) {
       //Store variables as final so there are immutable and can't be changed.
       case 1:
+        addIngredient(foodStorage, scanner);
+        break;
+      case 2:
+        //MAKE NEW FUNCTIONS HERE TO SEPARATE THE CODE
+        System.out.println("Removing ingredient");
+        break;
+      case 3:
+        System.out.println("Showing all ingredients");
+        break;
+      case 4:
+        System.out.println("Exiting");
+        break;
+      default:
+        System.out.println("Invalid choice");
+    }
+  }
+
+  public static void addIngredient(FoodStorage foodStorage, Scanner scanner){
+
         System.out.println("Whats your ingredient name?");
         final String name = scanner.nextLine();
         // Name is a string since it can be any name.
-        System.out.println("How many items?");
+
+        System.out.println("What unit? \n 1. Kg \n 2. Liter \n 3. Pieces");
+        final String unitType = scanner.nextLine();
+        final String unit = switch (unitType) {
+          case "1"-> "Kg";
+          case "2"-> "Liter";
+          case "3"-> "Pieces";
+          default ->{
+            System.out.println("Invalid choice");
+            yield "Invalid";
+
+          }
+        };
+        if (unit.equals("Invalid")){
+            System.exit(0);
+        }
+
+        System.out.println("How many " + unit + " do you have?");
         final int numberOfItems = scanner.nextInt();
         // Number of items is an integer since it can only be a whole number.
         scanner.nextLine();
 
-        System.out.println("What unit?"); // Unit is a string since it can be any unit.
-        final String unit = scanner.nextLine();
 
         System.out.println("What price?");
         final double price = scanner.nextDouble();
@@ -56,8 +83,16 @@ public class Ui {
         // Expiration date is a string since it can be any date.
         LocalDate expirationDate = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
         // LocalDate is used to store the date in a more readable format.
+<<<<<<< Updated upstream
+        if (!unit.equals("Invalid")){
+          Ingredient ingredient = new Ingredient(name, unit, numberOfItems, price, expirationDate);
+          ingredient.addingIngredient(foodStorage);
+        }else{
+          System.out.println("Choose another unit");
+        }
+=======
 
-        Ingredient ingredient = new Ingredient(name, numberOfItems, unit, price, expirationDate);
+        Ingredient ingredient = new Ingredient(name, unit, numberOfItems, price, expirationDate);
         ingredient.addingIngredient(foodStorage);
         break;
       case 2:
@@ -73,17 +108,8 @@ public class Ui {
       default:
         System.out.println("Invalid choice");
     }
+>>>>>>> Stashed changes
   }
 
-  /**
-     * Main method for terminal user interface.
-    *
-     * @param args the command line arguments.
-     */
-  public static void main(String[] args) {
 
-    Ui ui = new Ui();
-    ui.init();
-    ui.start();
-  }
 }
