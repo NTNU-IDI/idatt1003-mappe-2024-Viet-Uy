@@ -8,12 +8,14 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * Class for storing food ingredients.
@@ -37,60 +39,73 @@ public class FoodStorage {
    * @param scanner the scanner object to read input from the user.
    */
   public void addIngredient(Scanner scanner) {
-    System.out.println("Whats your ingredient name?");
-    final String name = scanner.nextLine();
-    // Name is a string since it can be any name.
 
-    System.out.println("What unit? \n 1. Gram \n 2. Liter \n 3. Pieces");
-    final String unitType = scanner.nextLine();
-    final String unit = switch (unitType) {
-      case "1" -> "Gram";
-      case "2" -> "Liter";
-      case "3" -> "Pieces";
-      default ->
+    while (true) {
+      System.out.println("Whats your ingredient name?");
+      final String name = scanner.nextLine();
+      // Name is a string since it can be any name.
+
+      System.out.println("What unit? \n 1. Gram \n 2. Liter \n 3. Pieces");
+      final String unitType = scanner.nextLine();
+      final String unit = switch (unitType) {
+        case "1" -> "Gram";
+        case "2" -> "Liter";
+        case "3" -> "Pieces";
+        default ->
         {
-        System.out.println("Invalid choice");
-        yield "Invalid";
+          System.out.println("Invalid choice");
+          yield null; // Use yield to return a value from the switch expression
+
         }
-    };
-    if (unit.equals("Invalid")) {
-      return;
-      //System.exit(0);
+      };
+
+      if (unit == null) {
+        return; // Exit the method if the unit is invalid
+      }
+
+
+      int numberOfUnits = 0;
+      while (true) {
+        System.out.println("How many " + unit + " do you have?");
+        try {
+          numberOfUnits = Integer.parseInt(scanner.nextLine());
+          System.out.println("Number of units: " + numberOfUnits);
+          break;
+        } catch (NumberFormatException e) {
+          System.out.println("Invalid number of units. Please enter a valid integer.");
+          return;
+        }
+      }
+
+
+
+
+      System.out.println("What price?");
+      if (!scanner.hasNextDouble()) {
+        System.out.println("Invalid price (use a decimal point with comma instead of dot)");
+        scanner.nextLine(); // Consume the invalid input
+        return;
+      }
+
+
+      final double price = scanner.nextDouble();
+      // Price is a double since we can include decimals, providing a more accurate price.
+      scanner.nextLine();
+
+      System.out.println("What is the expiration date? (YYYY-MM-DD)");
+      final String dateInput = scanner.nextLine();
+      LocalDate expirationDate;
+      try {
+        expirationDate = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
+      } catch (Exception e) {
+        System.out.println("Invalid date format");
+        return;
+      }
+      Ingredient ingredient = new Ingredient(name, unit, numberOfUnits, price, expirationDate);
+      ingredients.add(ingredient);
+      saveIngredientsToFile("ingredients.txt", ingredient); //Saving the ingredients to a file.
     }
 
-    System.out.println("How many " + unit + " do you have?");
-    if (!scanner.hasNextInt()) {
-      System.out.println("Invalid number of units");
-      return;
-    }
-    final int numberOfUnits = scanner.nextInt();
-    // Number of items is an integer since it can only be a whole number.
-    scanner.nextLine();
-
-    System.out.println("What price?");
-    if (!scanner.hasNextDouble()) {
-      System.out.println("Invalid price (use a decimal point with comma instead of dot)");
-      scanner.nextLine(); // Consume the invalid input
-      return;
-    }
-
-
-    final double price = scanner.nextDouble();
-    // Price is a double since we can include decimals, providing a more accurate price.
-    scanner.nextLine();
-
-    System.out.println("What is the expiration date? (YYYY-MM-DD)");
-    final String dateInput = scanner.nextLine();
-    LocalDate expirationDate;
-    try {
-      expirationDate = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
-    } catch (Exception e) {
-      System.out.println("Invalid date format");
-      return;
-    }
-    Ingredient ingredient = new Ingredient(name, unit, numberOfUnits, price, expirationDate);
-    ingredients.add(ingredient);
-    saveIngredientsToFile("ingredients.txt", ingredient); //Saving the ingredients to a file.
   }
 
 
