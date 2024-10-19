@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class Ingredient {
   private final String name;
   private final String unit;
-  private final int numberOfItems;
+  private final int numberOfUnits;
   private final double price;
   private final LocalDate expirationDate;
 
@@ -17,7 +17,7 @@ public class Ingredient {
    *
    * @param name name of food.
    * @param unit unit of measurement.
-   * @param numberOfItems number of items.
+   * @param numberOfUnits number of items.
    *
    * @param price price of food.
    * @param expirationDate expiration date of food.
@@ -25,12 +25,12 @@ public class Ingredient {
   public Ingredient(
       String name,
       String unit,
-      int numberOfItems,
+      int numberOfUnits,
       double price,
       LocalDate expirationDate) {
 
     this.name = name;
-    this.numberOfItems = numberOfItems;
+    this.numberOfUnits = numberOfUnits;
     this.unit = unit;
     this.price = price;
     this.expirationDate = expirationDate;
@@ -42,20 +42,30 @@ public class Ingredient {
     return "Ingredient{"
             + "name='" + name + '\''
             + ", unit='" + unit + '\''
-            + ", numberOfItems=" + numberOfItems
+            + ", numberOfUnits=" + numberOfUnits
             + ", price=" + price
             + ", expirationDate=" + expirationDate
             + '}';
   }
 
-  /**
-   * Add all the values called in the constructor to the food storage function.
-   *
-   * @param foodStorage Makes it so I can interact with the food storage class.
-   */
-  public void addingIngredient(FoodStorage foodStorage) {
-    foodStorage.addToStorage(this); //Adding the output of the toString method to the food storage.
-    foodStorage.saveIngredientsToFile("ingredients.txt"); //Saving the ingredients to a file.
+  public String getName() {
+    return name;
+  }
+
+  public String getUnit() {
+    return unit;
+  }
+
+  public int getNumberOfItems() {
+    return numberOfUnits;
+  }
+
+  public double getPrice() {
+    return price;
+  }
+
+  public LocalDate getExpirationDate() {
+    return expirationDate;
   }
 
 

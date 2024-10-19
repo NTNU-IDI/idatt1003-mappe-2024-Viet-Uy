@@ -1,6 +1,7 @@
 package edu.ntnu.idi.bidata.ui;
 
 import edu.ntnu.idi.bidata.FoodStorage;
+import edu.ntnu.idi.bidata.Ingredient;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -13,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UiTest {
     static class MockFoodStorage extends FoodStorage{
-        @Override
         public void saveIngredientsToFile(String filename){
             // Do nothing
         }
@@ -29,11 +29,8 @@ class UiTest {
         System.setOut(new PrintStream(outputStream));
 
         FoodStorage foodStorage = new MockFoodStorage();
-<<<<<<< Updated upstream
-        Ui.addIngredient(foodStorage, new Scanner(System.in));
-=======
+
         //Ui.saveIngredientsToFile(foodStorage, new Scanner(System.in));
->>>>>>> Stashed changes
 
         String output = outputStream.toString(StandardCharsets.UTF_8);
         assertTrue(output.contains("Invalid choice"));
