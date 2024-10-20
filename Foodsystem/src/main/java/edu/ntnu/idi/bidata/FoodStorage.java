@@ -1,14 +1,14 @@
 package edu.ntnu.idi.bidata;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -39,8 +39,8 @@ public class FoodStorage {
    * @param scanner the scanner object to read input from the user.
    */
   public void addIngredient(Scanner scanner) {
-
-    while (true) {
+    boolean loop = true;
+    while (loop) {
       System.out.println("Whats your ingredient name?");
       final String name = scanner.nextLine();
       // Name is a string since it can be any name.
@@ -52,33 +52,26 @@ public class FoodStorage {
         case "2" -> "Liter";
         case "3" -> "Pieces";
         default ->
-        {
-          System.out.println("Invalid choice");
-          yield null; // Use yield to return a value from the switch expression
+          {
+            System.out.println("Invalid choice");
+            yield null; // Use yield to return a value from the switch expression
 
-        }
+          }
       };
 
       if (unit == null) {
         return; // Exit the method if the unit is invalid
       }
 
-
       int numberOfUnits = 0;
-      while (true) {
-        System.out.println("How many " + unit + " do you have?");
-        try {
-          numberOfUnits = Integer.parseInt(scanner.nextLine());
-          System.out.println("Number of units: " + numberOfUnits);
-          break;
-        } catch (NumberFormatException e) {
-          System.out.println("Invalid number of units. Please enter a valid integer.");
-          return;
-        }
+      System.out.println("How many " + unit + " do you have?");
+      try {
+        numberOfUnits = Integer.parseInt(scanner.nextLine());
+        System.out.println("Number of units: " + numberOfUnits);
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid number of units. Please enter a valid integer.");
+        return;
       }
-
-
-
 
       System.out.println("What price?");
       if (!scanner.hasNextDouble()) {
@@ -104,6 +97,8 @@ public class FoodStorage {
       Ingredient ingredient = new Ingredient(name, unit, numberOfUnits, price, expirationDate);
       ingredients.add(ingredient);
       saveIngredientsToFile("ingredients.txt", ingredient); //Saving the ingredients to a file.
+      System.out.println("Ingredient added successfully!");
+      loop = false;
     }
 
   }
@@ -116,8 +111,13 @@ public class FoodStorage {
    * @param filename the name of the file to which the ingredients will be written.
    */
   public void saveIngredientsToFile(String filename, Ingredient ingredient) {
-
-    try (PrintWriter writer = new PrintWriter(new FileWriter(filename, true))) {
+    String resourcePath = getClass().getClassLoader().getResource("").getPath();
+    if (resourcePath == null) {
+      logger.log(Level.SEVERE, "Resource path is null");
+      return;
+    }
+    String filePath = resourcePath + filename;
+    try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
       writer.println(ingredient.toString());
     } catch (IOException e) {
       logger.log(Level.SEVERE, "Could not save ingredients to file", e);
@@ -135,24 +135,31 @@ public class FoodStorage {
         + " expirationDate=(\\d{4}-\\d{2}-\\d{2})";
     Pattern pattern = Pattern.compile(regex);
 
-    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line);
-        if (matcher.find()) {
-          String name = matcher.group(1);
-          String unit = matcher.group(2);
-          int numberOfItems = Integer.parseInt(matcher.group(3));
-          double price = Double.parseDouble(matcher.group(4));
-          LocalDate expirationDate = LocalDate.parse(matcher.group(5));
-
-          Ingredient ingredient = new Ingredient(name, unit, numberOfItems, price, expirationDate);
-          ingredients.add(ingredient);
+    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename)) {
+      if (inputStream == null) {
+        logger.log(Level.SEVERE, "File not found: " + filename);
+        return;
+      }
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          Matcher matcher = pattern.matcher(line);
+          if (matcher.find()) {
+            String name = matcher.group(1);
+            String unit = matcher.group(2);
+            int numberOfItems = Integer.parseInt(matcher.group(3));
+            double price = Double.parseDouble(matcher.group(4));
+            LocalDate expirationDate = LocalDate.parse(matcher.group(5));
+            Ingredient ingredient = new Ingredient(name, unit, numberOfItems,
+                price, expirationDate);
+            ingredients.add(ingredient);
+          }
         }
       }
     } catch (IOException e) {
       logger.log(Level.SEVERE, "Could not load ingredients from file", e);
     }
+
     System.out.printf("%-20s %-20s %-10s %-10s %-15s%n", "Name", "Number of Units",
         "Unit", "Price", "Expiration Date");
     System.out.println("-----------------------------------------------"
