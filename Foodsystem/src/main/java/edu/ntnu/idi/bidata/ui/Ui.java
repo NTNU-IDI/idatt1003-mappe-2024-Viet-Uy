@@ -37,8 +37,8 @@ public class Ui {
             foodStorage.addIngredient(scanner);
             break;
           case 2:
-            // MAKE NEW FUNCTIONS HERE TO SEPARATE THE CODE
             System.out.println("Removing ingredient");
+            foodStorage.removeIngredient(scanner);
             break;
           case 3:
             System.out.println("Showing all ingredients");
@@ -57,18 +57,5 @@ public class Ui {
       }
 
     }
-  }
-
-
-  /**
-   * Main method to start the program.
-   *
-   * @param args the command line arguments.
-   */
-
-  public static void main(String[] args) {
-    Ui ui = new Ui();
-    ui.init();
-    ui.start();
   }
 }

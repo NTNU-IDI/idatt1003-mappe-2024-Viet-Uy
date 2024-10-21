@@ -1,5 +1,7 @@
 package edu.ntnu.idi.bidata;
 
+import edu.ntnu.idi.bidata.ui.Ui;
+
 /**
  * Main class for the food system.
  */
@@ -11,6 +13,8 @@ public class Main {
    * @param args the command line arguments.
    */
   public static void main(String[] args) {
-    System.out.println("Hello, World!");
+    Ui ui = new Ui();
+    ui.init();
+    ui.start();
   }
 }

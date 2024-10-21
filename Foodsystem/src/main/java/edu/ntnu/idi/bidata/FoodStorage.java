@@ -1,11 +1,13 @@
 package edu.ntnu.idi.bidata;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class FoodStorage {
    */
   public FoodStorage() {
     ingredients = new ArrayList<>(); //Creating a new arraylist of ingredients.
+
   }
 
   /**
@@ -62,12 +65,10 @@ public class FoodStorage {
       if (unit == null) {
         return; // Exit the method if the unit is invalid
       }
-
-      int numberOfUnits = 0;
+      int numberOfUnits;
       System.out.println("How many " + unit + " do you have?");
       try {
         numberOfUnits = Integer.parseInt(scanner.nextLine());
-        System.out.println("Number of units: " + numberOfUnits);
       } catch (NumberFormatException e) {
         System.out.println("Invalid number of units. Please enter a valid integer.");
         return;
@@ -103,6 +104,57 @@ public class FoodStorage {
 
   }
 
+  /**
+   * Removes ingredients from the list of ingredients.
+   */
+  public void removeIngredient(Scanner scanner) {
+    String filename = "ingredients.txt";
+    String regex = "name='(.*?)'";
+    Pattern pattern = Pattern.compile(regex);
+    FoodStorage foodStorage = new FoodStorage();
+    foodStorage.loadIngredientsFromFile(filename);
+    System.out.println("Enter the name of the ingredient you want to remove: ");
+    String name = scanner.nextLine();
+
+    URL resourceUrl = getClass().getClassLoader().getResource(filename);
+    if (resourceUrl == null) {
+      logger.log(Level.SEVERE, "Resource path is null");
+      return;
+    }
+    //Under development, fix this
+    String filePath = resourceUrl.getPath();
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        Matcher matcher = pattern.matcher(line);
+        String nameIngredient = matcher.group(1);
+        System.out.println(nameIngredient + "HE");
+        System.out.println(matcher);
+
+        if (line.contains(nameIngredient.toLowerCase())) {
+          System.out.println("Ingredient found!");
+          System.out.println("Do you want to remove this ingredient? (yes/no)");
+          String answer = scanner.nextLine().toLowerCase();
+          if (answer.equals("yes")) {
+            System.out.println("Ingredient removed!");
+          } else if (answer.equals("no")) {
+            System.out.println("Ingredient not removed!");
+          } else {
+            System.out.println("Invalid input!");
+          }
+        } else {
+          System.out.println("Ingredient not found!");
+
+        }
+      }
+    } catch (IOException e) {
+      System.out.println("Error");
+    }
+
+
+  }
+
+
 
   /**
    * Saves ingredients to a file. Writes line by line; if the file already exists
@@ -111,11 +163,12 @@ public class FoodStorage {
    * @param filename the name of the file to which the ingredients will be written.
    */
   public void saveIngredientsToFile(String filename, Ingredient ingredient) {
-    String resourcePath = getClass().getClassLoader().getResource("").getPath();
-    if (resourcePath == null) {
+    URL resourceUrl = getClass().getClassLoader().getResource("");
+    if (resourceUrl == null) {
       logger.log(Level.SEVERE, "Resource path is null");
       return;
     }
+    String resourcePath = resourceUrl.getPath();
     String filePath = resourcePath + filename;
     try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
       writer.println(ingredient.toString());
@@ -176,6 +229,12 @@ public class FoodStorage {
         + "---------------------------------------\n");
 
   }
+
+  /**
+   * Used for testing purposes in the test class.
+   *
+   * @return the list of ingredients.
+   */
 
   public List<Ingredient> getIngredients() {
     return ingredients;
