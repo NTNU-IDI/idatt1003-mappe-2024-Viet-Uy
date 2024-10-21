@@ -1,12 +1,6 @@
 package edu.ntnu.idi.bidata;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -121,37 +115,61 @@ public class FoodStorage {
       logger.log(Level.SEVERE, "Resource path is null");
       return;
     }
-    //Under development, fix this
     String filePath = resourceUrl.getPath();
     try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
       String line;
       while ((line = br.readLine()) != null) {
         Matcher matcher = pattern.matcher(line);
-        String nameIngredient = matcher.group(1);
-        System.out.println(nameIngredient + "HE");
-        System.out.println(matcher);
-
-        if (line.contains(nameIngredient.toLowerCase())) {
-          System.out.println("Ingredient found!");
-          System.out.println("Do you want to remove this ingredient? (yes/no)");
-          String answer = scanner.nextLine().toLowerCase();
-          if (answer.equals("yes")) {
-            System.out.println("Ingredient removed!");
-          } else if (answer.equals("no")) {
-            System.out.println("Ingredient not removed!");
+        if (matcher.find()) {
+          String nameIngredient = matcher.group(1);
+          if (nameIngredient.equalsIgnoreCase(name)) {
+            System.out.println("Ingredient found!");
+            System.out.println("Do you want to remove this ingredient? (yes/no)");
+            String answer = scanner.nextLine().toLowerCase();
+            if (answer.equals("yes")) {
+              System.out.println("Ingredient removed!");
+            } else if (answer.equals("no")) {
+              System.out.println("Ingredient not removed!");
+            } else {
+              System.out.println("Invalid input!");
+            }
           } else {
-            System.out.println("Invalid input!");
+            System.out.println("Ingredient not found!");
           }
-        } else {
-          System.out.println("Ingredient not found!");
-
         }
+
       }
     } catch (IOException e) {
       System.out.println("Error");
     }
+  }
 
+  private void removeLineFromFile(String filePath, String lineToRemove) {
+    File inputFile = new File(filePath);
+    File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
 
+    try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+         PrintWriter writer = new PrintWriter(new FileWriter(tempFile))) {
+
+      String currentLine;
+      while ((currentLine = reader.readLine()) != null) {
+        if (currentLine.trim().equals(lineToRemove.trim())) {
+          continue;
+        }
+        writer.println(currentLine);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    if (!inputFile.delete()) {
+      System.out.println("Could not delete file");
+      return;
+    }
+
+    if (!tempFile.renameTo(inputFile)) {
+      System.out.println("Could not rename file");
+    }
   }
 
 
