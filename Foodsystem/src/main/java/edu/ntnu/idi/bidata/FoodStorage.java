@@ -2,6 +2,9 @@ package edu.ntnu.idi.bidata;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -127,6 +130,7 @@ public class FoodStorage {
             System.out.println("Do you want to remove this ingredient? (yes/no)");
             String answer = scanner.nextLine().toLowerCase();
             if (answer.equals("yes")) {
+              removeLineFromFile(filePath, line);
               System.out.println("Ingredient removed!");
             } else if (answer.equals("no")) {
               System.out.println("Ingredient not removed!");
@@ -145,31 +149,45 @@ public class FoodStorage {
   }
 
   private void removeLineFromFile(String filePath, String lineToRemove) {
-    File inputFile = new File(filePath);
-    File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
+    String tempFile = "temp.txt";
 
-    try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-         PrintWriter writer = new PrintWriter(new FileWriter(tempFile))) {
+    URL resourceUrl = getClass().getClassLoader().getResource("ingredients.txt");
+    if (resourceUrl == null) {
+      logger.log(Level.SEVERE, "Resource path is null");
+      return;
+    }
+    String resourcePath = resourceUrl.getPath();
+    File oldFile = new File(resourcePath);
+    File newFile = new File(oldFile.getParent(), tempFile);
+
+    try (BufferedReader br = new BufferedReader(new FileReader(oldFile));
+         PrintWriter pw = new PrintWriter(new FileWriter(newFile))) {
 
       String currentLine;
-      while ((currentLine = reader.readLine()) != null) {
-        if (currentLine.trim().equals(lineToRemove.trim())) {
-          continue;
+      while ((currentLine = br.readLine()) != null) {
+        if (!currentLine.equals(lineToRemove)) {
+          pw.println(currentLine);
         }
-        writer.println(currentLine);
       }
     } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    if (!inputFile.delete()) {
-      System.out.println("Could not delete file");
+      logger.log(Level.SEVERE, "Error processing file", e);
       return;
     }
 
-    if (!tempFile.renameTo(inputFile)) {
-      System.out.println("Could not rename file");
+    // Copy contents from the temporary file back to the original file
+    try (BufferedReader br = new BufferedReader(new FileReader(newFile));
+         PrintWriter pw = new PrintWriter(new FileWriter(oldFile))) {
+
+      String currentLine;
+      while ((currentLine = br.readLine()) != null) {
+        pw.println(currentLine);
+      }
+    } catch (IOException e) {
+      logger.log(Level.SEVERE, "Error copying file contents", e);
     }
+
+    // Delete the temporary file
+    newFile.delete();
   }
 
 
@@ -182,11 +200,13 @@ public class FoodStorage {
    */
   public void saveIngredientsToFile(String filename, Ingredient ingredient) {
     URL resourceUrl = getClass().getClassLoader().getResource("");
+
     if (resourceUrl == null) {
       logger.log(Level.SEVERE, "Resource path is null");
       return;
     }
     String resourcePath = resourceUrl.getPath();
+
     String filePath = resourcePath + filename;
     try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
       writer.println(ingredient.toString());
