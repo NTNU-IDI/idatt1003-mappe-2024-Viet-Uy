@@ -71,4 +71,44 @@ class FoodStorageTest {
         File file = new File("test_ingredients.txt");
         assertTrue(file.delete(), "Failed to delete the test file");
     }
+
+    @Test
+    void testRemoveIngredientPositive() throws IOException {
+        Ingredient ingredient = new Ingredient("Apple", "Gram", 10, 1.99, LocalDate.of(2024, 12, 12));
+        foodStorage.saveIngredientsToFile("test_ingredients.txt", ingredient);
+
+        FileWriter writer = new FileWriter("test_ingredients.txt", true);
+        writer.write(ingredient + "\n");
+        writer.close();
+
+        Scanner scanner = new Scanner("Apple\nyes\n");
+
+        foodStorage.removeIngredient(scanner);
+
+        foodStorage.loadIngredientsFromFile("test_ingredients.txt");
+        assertEquals(0, foodStorage.getIngredients().size());
+
+        File file = new File("test_ingredients.txt");
+        assertTrue(file.delete(), "Failed to delete the test file");
+    }
+
+    @Test
+    void testRemoveIngredientNegative() throws IOException {
+        Ingredient ingredient = new Ingredient("Apple", "Gram", 10, 1.99, LocalDate.of(2024, 12, 12));
+        foodStorage.saveIngredientsToFile("test_ingredients.txt", ingredient);
+
+        FileWriter writer = new FileWriter("test_ingredients.txt", true);
+        writer.write(ingredient + "\n");
+        writer.close();
+
+        Scanner scanner = new Scanner("Banana\n");
+
+        foodStorage.removeIngredient(scanner);
+
+        foodStorage.loadIngredientsFromFile("test_ingredients.txt");
+        assertEquals(1, foodStorage.getIngredients().size());
+
+        File file = new File("test_ingredients.txt");
+        assertTrue(file.delete(), "Failed to delete the test file");
+    }
 }

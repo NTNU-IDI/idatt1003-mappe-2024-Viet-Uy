@@ -27,7 +27,7 @@ public class Ui {
   public void start() {
     boolean checker = true;
     while (checker) {
-      String choices = "\n1:Add ingredient\n2:Remove ingredient\n3:Show all ingredients\n4:Exit";
+      String choices = "\n1:Add ingredient\n2:Remove ingredient\n3:Show all ingredients\n4:Expired goods \n5:Add recipe \n6:Show recipe \n7:Make food from ingredients  \n8:Exit";
       System.out.println("What do you want to do?" + choices);
       try {
         int choice = scanner.nextInt();
@@ -45,6 +45,24 @@ public class Ui {
             foodStorage.loadIngredientsFromFile("ingredients.txt");
             break;
           case 4:
+            System.out.println("Food storage: ");
+            foodStorage.expiredGoods();
+            break;
+          case 5:
+            System.out.println("Add recipes to the cooking book:");
+            foodStorage.addRecipe(scanner);
+            break;
+          case 6:
+            //Under development
+            System.out.println("Showing recipes");
+            //foodStorage.showRecipe();
+            break;
+          case 7:
+            //Under development
+            System.out.println("Making food from ingredients");
+            //foodStorage.makeFood(scanner);
+            break;
+          case 8:
             checker = false;
             System.out.println("Exiting");
             break;

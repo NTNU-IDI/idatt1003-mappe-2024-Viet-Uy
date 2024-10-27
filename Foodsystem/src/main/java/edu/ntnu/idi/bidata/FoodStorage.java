@@ -2,18 +2,18 @@ package edu.ntnu.idi.bidata;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Comparator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 
 /**
@@ -130,7 +130,10 @@ public class FoodStorage {
             System.out.println("Do you want to remove this ingredient? (yes/no)");
             String answer = scanner.nextLine().toLowerCase();
             if (answer.equals("yes")) {
-              removeLineFromFile(filePath, line);
+              System.out.println("How many units do you want to remove? (0 to remove all)");
+              int unitsToRemove = scanner.nextInt();
+              removeLineFromFile(line, unitsToRemove);
+
               System.out.println("Ingredient removed!");
             } else if (answer.equals("no")) {
               System.out.println("Ingredient not removed!");
@@ -148,7 +151,8 @@ public class FoodStorage {
     }
   }
 
-  private void removeLineFromFile(String filePath, String lineToRemove) {
+  private void removeLineFromFile(String lineToRemove, int unitsToRemove) {
+
     String tempFile = "temp.txt";
 
     URL resourceUrl = getClass().getClassLoader().getResource("ingredients.txt");
@@ -165,16 +169,29 @@ public class FoodStorage {
 
       String currentLine;
       while ((currentLine = br.readLine()) != null) {
-        if (!currentLine.equals(lineToRemove)) {
-          pw.println(currentLine);
+        if (currentLine.equals(lineToRemove)) {
+          Matcher matcher = Pattern.compile("numberOfUnits=(\\d+)").matcher(currentLine);
+          if (matcher.find()) {
+            int numberOfUnits = Integer.parseInt(matcher.group(1));
+            if (numberOfUnits > unitsToRemove) {
+              if (unitsToRemove == 0) {
+                continue;
+              }else {
+                int newNumberOfUnits = numberOfUnits - unitsToRemove;
+                currentLine = currentLine.replace("numberOfUnits=" + numberOfUnits, "numberOfUnits=" + newNumberOfUnits);
+              }
+            } else {
+              continue;
+            }
+          }
         }
+        pw.println(currentLine);
       }
     } catch (IOException e) {
       logger.log(Level.SEVERE, "Error processing file", e);
       return;
     }
 
-    // Copy contents from the temporary file back to the original file
     try (BufferedReader br = new BufferedReader(new FileReader(newFile));
          PrintWriter pw = new PrintWriter(new FileWriter(oldFile))) {
 
@@ -186,10 +203,11 @@ public class FoodStorage {
       logger.log(Level.SEVERE, "Error copying file contents", e);
     }
 
-    // Delete the temporary file
-    newFile.delete();
-  }
+    if (!newFile.delete()) {
+      logger.log(Level.SEVERE, "Could not delete temporary file: " + newFile.getAbsolutePath());
+    }
 
+  }
 
 
   /**
@@ -251,6 +269,8 @@ public class FoodStorage {
       logger.log(Level.SEVERE, "Could not load ingredients from file", e);
     }
 
+    ingredients.sort(Comparator.comparing((Ingredient::getName)));
+
     System.out.printf("%-20s %-20s %-10s %-10s %-15s%n", "Name", "Number of Units",
         "Unit", "Price", "Expiration Date");
     System.out.println("-----------------------------------------------"
@@ -267,6 +287,105 @@ public class FoodStorage {
         + "---------------------------------------\n");
 
   }
+
+  public void expiredGoods() {
+    loadIngredientsFromFile("ingredients.txt");
+    final String RED = "\u001B[31m";
+    final String RESET = "\u001B[0m";
+
+    System.out.println("Expired goods: ");
+    System.out.printf("%-20s %-20s %-10s %-10s %-15s%n", "Name", "Number of Units",
+        "Unit", "Price", "Expiration Date");
+    System.out.println("-----------------------------------------------"
+        + "---------------------------------------");
+    for (Ingredient ingredient : ingredients) {
+      if (ingredient.getExpirationDate().isBefore(LocalDate.now())) {
+        System.out.printf("%-20s %-20d %-10s %-10.2f "+ RED + "%-15s"+ RESET + "%n",
+            ingredient.getName(),
+            ingredient.getNumberOfItems(),
+            ingredient.getUnit(),
+            ingredient.getPrice(),
+            ingredient.getExpirationDate());
+      }
+    }
+    System.out.println("-----------------------------------------------"
+        + "---------------------------------------\n");
+  }
+
+    /**
+     * Adds a recipe to the cooking book.
+     *
+     * @param scanner the scanner object to read input from the user.
+     */
+    public void addRecipe(Scanner scanner) {
+      HashMap<String, IngredientInfo> cookBook = new HashMap<>();
+      boolean checker = true;
+      System.out.println("Enter the name of the recipe: ");
+      String recipeName = scanner.nextLine();
+      while (checker) {
+        System.out.println("Enter the ingredient name: ");
+        String ingredientName = scanner.nextLine();
+        System.out.println("What unit? \n 1. Gram \n 2. Liter \n 3. Pieces");
+        String unitType = scanner.nextLine();
+        String unit = switch (unitType) {
+          case "1" -> "Gram";
+          case "2" -> "Liter";
+          case "3" -> "Pieces";
+          default -> {
+            System.out.println("Invalid choice");
+            yield null;
+          }
+
+        };
+        System.out.println("How many " + unit + " do you need?");
+        int amount = scanner.nextInt();
+        scanner.nextLine();
+
+        if (unit != null) {
+          cookBook.put(ingredientName, new IngredientInfo(ingredientName, amount, unit));
+        }
+        System.out.println("Do you want to add more ingredients? (yes/no)");
+        String answer = scanner.nextLine().toLowerCase();
+        if (answer.equals("no")) {
+          checker = false;
+        } else if (!answer.equals("yes")) {
+          System.out.println("Invalid input!");
+          return;
+        }
+      }
+      System.out.println("Enter the instructions for the recipe: ");
+      String instructions = scanner.nextLine();
+
+      saveRecipeToFile("recipes.txt", new CookBook(recipeName, cookBook, instructions));
+    }
+
+    /**
+     * Saves a recipe to a file.
+     *
+     * @param filename the name of the file to which the recipe will be written.
+     * @param cookBook the recipe to be saved to the cook book.
+     */
+
+    public void saveRecipeToFile(String filename, CookBook cookBook) {
+      URL resourceUrl = getClass().getClassLoader().getResource("");
+      System.out.println(resourceUrl);
+
+        if (resourceUrl == null) {
+            logger.log(Level.SEVERE, "Resource path is null");
+            return;
+        }
+        String resourcePath = resourceUrl.getPath();
+
+        String filePath = resourcePath + filename;
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+            writer.println(cookBook.toString());
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Could not save recipe to file", e);
+        }
+    }
+
+
+
 
   /**
    * Used for testing purposes in the test class.
