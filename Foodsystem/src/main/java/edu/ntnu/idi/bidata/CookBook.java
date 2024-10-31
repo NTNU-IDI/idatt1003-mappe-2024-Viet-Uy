@@ -1,38 +1,36 @@
 package edu.ntnu.idi.bidata;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class CookBook {
-    private final String name;
-    private final HashMap<String, IngredientInfo> ingredients;
-    private final String instructions;
+    private final HashMap<String, Recipe> recipes;
 
     public CookBook(String name, HashMap<String, IngredientInfo> ingredients, String instructions) {
-        this.name = name;
-        this.ingredients = ingredients;
-        this.instructions = instructions;
+        this.recipes = new HashMap<>();
     }
 
-
-
-    public HashMap<String, IngredientInfo> getRecipeIngredients() {
-        return ingredients;
+    public void addRecipe(Recipe recipe) {
+        recipes.put(recipe.getName(), recipe);
     }
 
-    public String getInstructions() {
-        return instructions;
+    public Recipe getRecipe(String name) {
+        return recipes.get(name);
+    }
+
+    public void removeRecipe(String name) {
+        recipes.remove(name);
+    }
+
+    public boolean containsRecipe(String name) {
+        return recipes.containsKey(name);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Recipe Name: ").append(name).append("\n");
-        sb.append("Ingredients:\n");
-        for (Map.Entry<String, IngredientInfo> entry : ingredients.entrySet()) {
-            sb.append(entry.getValue().toString()).append("\n");
+        for (Recipe recipe : recipes.values()) {
+            sb.append(recipe.toString()).append("\n");
         }
-        sb.append("Instructions: ").append(instructions).append("\n");
         return sb.toString();
     }
 
