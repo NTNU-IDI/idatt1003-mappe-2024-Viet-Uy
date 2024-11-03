@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
-import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -312,80 +311,14 @@ public class FoodStorage {
         + "---------------------------------------\n");
   }
 
-    /**
-     * Adds a recipe to the cooking book.
-     *
-     * @param scanner the scanner object to read input from the user.
-     */
-    public void addRecipe(Scanner scanner) {
-      HashMap<String, IngredientInfo> cookBook = new HashMap<>();
-      boolean checker = true;
-      System.out.println("Enter the name of the recipe: ");
-      String recipeName = scanner.nextLine();
-      while (checker) {
-        System.out.println("Enter the ingredient name: ");
-        String ingredientName = scanner.nextLine();
-        System.out.println("What unit? \n 1. Gram \n 2. Liter \n 3. Pieces");
-        String unitType = scanner.nextLine();
-        String unit = switch (unitType) {
-          case "1" -> "Gram";
-          case "2" -> "Liter";
-          case "3" -> "Pieces";
-          default -> {
-            System.out.println("Invalid choice");
-            yield null;
-          }
-
-        };
-        System.out.println("How many " + unit + " do you need?");
-        int amount = scanner.nextInt();
-        scanner.nextLine();
-
-        if (unit != null) {
-          cookBook.put(ingredientName, new IngredientInfo(ingredientName, amount, unit));
-        }
-        System.out.println("Do you want to add more ingredients? (yes/no)");
-        String answer = scanner.nextLine().toLowerCase();
-        if (answer.equals("no")) {
-          checker = false;
-        } else if (!answer.equals("yes")) {
-          System.out.println("Invalid input!");
-          return;
-        }
+  public IngredientInfo getIngredient(String name) {
+    for (Ingredient ingredient : ingredients) {
+      if (ingredient.getName().equalsIgnoreCase(name)) {
+        return new IngredientInfo(ingredient.getName(), ingredient.getNumberOfItems(), ingredient.getUnit());
       }
-      System.out.println("Enter the instructions for the recipe: ");
-      String instructions = scanner.nextLine();
-
-      saveRecipeToFile("recipes.txt", new CookBook(recipeName, cookBook, instructions));
     }
-
-    /**
-     * Saves a recipe to a file.
-     *
-     * @param filename the name of the file to which the recipe will be written.
-     * @param cookBook the recipe to be saved to the cook book.
-     */
-
-    public void saveRecipeToFile(String filename, CookBook cookBook) {
-      URL resourceUrl = getClass().getClassLoader().getResource("");
-      System.out.println(resourceUrl);
-
-        if (resourceUrl == null) {
-            logger.log(Level.SEVERE, "Resource path is null");
-            return;
-        }
-        String resourcePath = resourceUrl.getPath();
-
-        String filePath = resourcePath + filename;
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
-            writer.println(cookBook.toString());
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Could not save recipe to file", e);
-        }
-    }
-
-
-
+    return null;
+  }
 
   /**
    * Used for testing purposes in the test class.
