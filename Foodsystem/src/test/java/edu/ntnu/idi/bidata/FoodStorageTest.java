@@ -25,7 +25,18 @@ class FoodStorageTest {
         String input = "Apple\n1\n10\n1.99\n2024-12-12\n";
         Scanner scanner = new Scanner(input);
         foodStorage.addIngredient(scanner);
-        assertEquals(1, foodStorage.getIngredients().size());
+
+        // Check the size of the ingredients list
+        assertEquals(1, foodStorage.getIngredients().size(), "The number of ingredients should be 1");
+
+        // Check the details of the added ingredient
+        Ingredient addedIngredient = foodStorage.getIngredients().get(0);
+        assertNotNull(addedIngredient, "The added ingredient should not be null");
+        assertEquals("Apple", addedIngredient.getName(), "The ingredient name should be 'Apple'");
+        assertEquals("Gram", addedIngredient.getUnit(), "The ingredient unit should be 'Gram'");
+        assertEquals(10, addedIngredient.getNumberOfItems(), "The number of units should be 10");
+        assertEquals(1.99, addedIngredient.getPrice(), "The price should be 1.99");
+        assertEquals(LocalDate.of(2024, 12, 12), addedIngredient.getExpirationDate(), "The expiration date should be 2024-12-12");
     }
 
     @Test

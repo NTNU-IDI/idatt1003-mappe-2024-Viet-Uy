@@ -72,14 +72,13 @@ public class CookBook {
                 return;
             }
         }
-        System.out.println("Enter the description for the recipe: ");
-        String description = scanner.nextLine();
         System.out.println("Enter the instructions for the recipe: ");
         String instructions = scanner.nextLine();
         System.out.println("Enter the number of people: ");
         int numberOfPeople = scanner.nextInt();
         scanner.nextLine();
-        Recipe recipe = new Recipe(recipeName, description, instructions, ingredients, numberOfPeople);
+
+        Recipe recipe = new Recipe(recipeName, instructions, ingredients, numberOfPeople);
         recipes.put(recipeName, recipe);
 
         saveRecipeToFile("recipes.txt",recipe);
@@ -184,37 +183,34 @@ public class CookBook {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             String recipeName = null;
-            String description = null;
             ArrayList<IngredientInfo> ingredients = new ArrayList<>();
             String instructions = null;
             int numberOfPeople = 0;
 
-            Pattern pattern = Pattern.compile("Recipe Name: (.+)|Description: (.+)|Ingredient: (.+), Amount: (\\d+) (.+)|Instructions: (.+)|Number of people: (\\d+)");
+            Pattern pattern = Pattern.compile("Recipe Name: (.+)|Ingredient: (.+), Amount: (\\d+) (.+)|Instructions: (.+)|Number of people: (\\d+)");
             while ((line = reader.readLine()) != null) {
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.matches()) {
                     if (matcher.group(1) != null) {
                         if (recipeName != null) {
-                            recipes.put(recipeName, new Recipe(recipeName, description, instructions, ingredients, numberOfPeople));
+                            recipes.put(recipeName, new Recipe(recipeName, instructions, ingredients, numberOfPeople));
                         }
                         recipeName = matcher.group(1);
                         ingredients = new ArrayList<>();
-                    } else if (matcher.group(2) != null) {
-                        description = matcher.group(2);
                     } else if (matcher.group(3) != null) {
-                        String ingredientName = matcher.group(3);
-                        int amount = Integer.parseInt(matcher.group(4));
-                        String unit = matcher.group(5);
+                        String ingredientName = matcher.group(2);
+                        int amount = Integer.parseInt(matcher.group(3));
+                        String unit = matcher.group(4);
                         ingredients.add(new IngredientInfo(ingredientName, amount, unit));
+                    } else if (matcher.group(5) != null) {
+                        instructions = matcher.group(5);
                     } else if (matcher.group(6) != null) {
-                        instructions = matcher.group(6);
-                    } else if (matcher.group(7) != null) {
-                        numberOfPeople = Integer.parseInt(matcher.group(7));
+                        numberOfPeople = Integer.parseInt(matcher.group(6));
                     }
                 }
             }
             if (recipeName != null) {
-                recipes.put(recipeName, new Recipe(recipeName, description, instructions, ingredients, numberOfPeople));
+                recipes.put(recipeName, new Recipe(recipeName, instructions, ingredients, numberOfPeople));
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Could not read recipes from file", e);
