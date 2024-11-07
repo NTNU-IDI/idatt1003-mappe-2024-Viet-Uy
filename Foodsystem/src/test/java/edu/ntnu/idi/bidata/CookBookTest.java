@@ -1,13 +1,16 @@
 package edu.ntnu.idi.bidata;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class CookBookTest {
 
@@ -40,7 +43,7 @@ class CookBookTest {
         cookBook.addRecipe(new Scanner("Apple Pie\nApple\n3\n2\nPieces\nno\nMix and bake\n4\n"));
         Recipe retrievedRecipe = cookBook.getRecipe("Apple Pie");
         assertNotNull(retrievedRecipe);
-        assertEquals("Apple Pie", retrievedRecipe.getName());
+      assertEquals("Apple Pie", retrievedRecipe.name());
     }
 
     @Test

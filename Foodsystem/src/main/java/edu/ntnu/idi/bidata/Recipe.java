@@ -2,47 +2,26 @@ package edu.ntnu.idi.bidata;
 
 import java.util.ArrayList;
 
-public class Recipe {
-    private final String name;
-    private final String instructions;
-    private final ArrayList<IngredientInfo> ingredients;
-    private final int numberOfPeople;
-
-    public Recipe(String name, String instructions, ArrayList<IngredientInfo> ingredients, int numberOfPeople) {
-        this.name = name;
-        this.instructions = instructions;
-        this.ingredients = ingredients;
-        this.numberOfPeople = numberOfPeople;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-
-    public String getInstructions() {
-        return instructions;
-    }
-
-    public ArrayList<IngredientInfo> getIngredients() {
-        return ingredients;
-    }
-
-    public int getNumberOfPeople() {
-        return numberOfPeople;
-    }
+// This class represents a recipe, which consists of a name, instructions, ingredients and the number of people it serves.
+public record Recipe(String name, String instructions, ArrayList<IngredientInfo> ingredients,
+                     int numberOfPeople) {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Recipe Name: ").append(name).append("\n");
-        sb.append("Ingredients:\n");
-        for (IngredientInfo ingredient : ingredients) {
-            sb.append(ingredient.toString()).append("\n");
+        StringBuilder sb =
+            new StringBuilder(); // StringBuilder is used to concatenate strings efficiently
+        sb.append("Recipe Name: ").append(name)
+            .append("\n"); // append() is used to add strings to the StringBuilder
+        sb.append("Ingredients:\n"); // \n is used to add a newline character
+        for (IngredientInfo ingredient : ingredients) { // Loop through all ingredients
+            sb.append(ingredient.toString()).append(
+                "\n"); // Add the string representation of the ingredient to the StringBuilder
         }
-        sb.append("Instructions: ").append(instructions).append("\n");
-        sb.append("Number of people: ").append(numberOfPeople).append("\n");
-        return sb.toString();
+        sb.append("Instructions: ").append(instructions)
+            .append("\n"); // Add the instructions to the StringBuilder
+        sb.append("Number of people: ").append(numberOfPeople)
+            .append("\n"); // Add the number of people to the StringBuilder
+        return sb.toString(); // Return the string representation of the StringBuilder
     }
 
 

@@ -14,7 +14,7 @@ public class Main {
    */
   public static void main(String[] args) {
     Ui ui = new Ui();
-    ui.init();
-    ui.start();
+    ui.init(); // Initialize the user interface
+    ui.start(); // Start the user interface
   }
 }
