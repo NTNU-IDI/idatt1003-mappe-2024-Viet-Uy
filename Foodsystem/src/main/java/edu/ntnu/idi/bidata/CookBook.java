@@ -84,7 +84,7 @@ public class CookBook {
    *
    * @param scanner the scanner object to read input from the user.
    */
-  public void addRecipe(Scanner scanner) {
+  public void addRecipe(Scanner scanner, FoodStorage foodStorage) {
     // ArrayList to store ingredients
     ArrayList<IngredientInfo> ingredients = new ArrayList<>(getIngredients().values());
     boolean checker = true;
@@ -122,7 +122,16 @@ public class CookBook {
           continue;
         }
 
-        ingredients.add(new IngredientInfo(ingredientName, amount, unit));
+        System.out.println("Enter the price per unit: ");
+        double price;
+        try {
+          price = Double.parseDouble(scanner.nextLine());
+        } catch (NumberFormatException e) {
+          System.out.println("Invalid price. Please enter a valid number.");
+          continue;
+        }
+
+        ingredients.add(new IngredientInfo(ingredientName, amount, unit, price));
 
         System.out.println("Do you want to add more ingredients? (yes/no)");
         String answer = scanner.nextLine().toLowerCase();
@@ -226,6 +235,8 @@ public class CookBook {
 
       for (Recipe recipe : recipes.values()) {
         boolean canMakeRecipe = true;
+        double totalPrice = 0.0;
+
         for (IngredientInfo ingredient : recipe.ingredients()) {
           IngredientInfo availableIngredient = foodStorage.getIngredients(ingredient.getName());
           if (availableIngredient == null
@@ -233,10 +244,18 @@ public class CookBook {
               || !availableIngredient.getUnit().equals(ingredient.getUnit())) {
             canMakeRecipe = false;
             break;
+          } else {
+
+            double ingredientPrice = availableIngredient.getPrice();
+            totalPrice += ingredientPrice;
+            System.out.printf("Ingredient: %s, Amount: %d, Subtotal: %.2f%n",
+                ingredient.getName(), ingredient.getAmount(), ingredientPrice);
           }
         }
         if (canMakeRecipe) {
           suggestedRecipes.add(recipe);
+          System.out.printf("Recipe: %s, Total Price: %.2f%n", recipe.name(), totalPrice);
+
         }
       }
 
@@ -276,29 +295,28 @@ public class CookBook {
       int numberOfPeople = 0; // Integer to store the number of people
 
       Pattern pattern = Pattern.compile(
-          "Recipe Name: (.+)|Ingredient: (.+), Amount: (\\d+) (.+)|"
+          "Recipe Name: (.+)|Ingredient: (.+), Amount: (\\d+) (.+), Price: (\\d+\\.\\d+)|"
               + "Instructions: (.+)|Number of people: (\\d+)");
       while ((line = reader.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line); // Create a matcher object
-        if (matcher.matches()) { // If the matcher matches
-          if (matcher.group(1) != null) { // If the first group is not null
-            if (recipeName != null) { // If the recipe name is not null
-              // Add the recipe to the recipes:
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.matches()) {
+          if (matcher.group(1) != null) {
+            if (recipeName != null) {
               recipes.put(recipeName,
                   new Recipe(recipeName, instructions, ingredients, numberOfPeople));
             }
-            recipeName = matcher.group(1); // Set the recipe name
+            recipeName = matcher.group(1);
             ingredients = new ArrayList<>();
-          } else if (matcher.group(3) != null) { // If the third group is not null
-            String ingredientName = matcher.group(2); // Get the ingredient name
-            int amount = Integer.parseInt(matcher.group(3)); // Get the amount
-            String unit = matcher.group(4); // Get the unit
-            // Add the ingredient to the list:
-            ingredients.add(new IngredientInfo(ingredientName, amount, unit));
-          } else if (matcher.group(5) != null) {
-            instructions = matcher.group(5); // Get the instructions
+          } else if (matcher.group(3) != null) {
+            String ingredientName = matcher.group(2);
+            int amount = Integer.parseInt(matcher.group(3));
+            String unit = matcher.group(4);
+            double price = Double.parseDouble(matcher.group(5));
+            ingredients.add(new IngredientInfo(ingredientName, amount, unit, price));
           } else if (matcher.group(6) != null) {
-            numberOfPeople = Integer.parseInt(matcher.group(6)); // Get the number of people
+            instructions = matcher.group(6);
+          } else if (matcher.group(7) != null) {
+            numberOfPeople = Integer.parseInt(matcher.group(7));
           }
         }
       }

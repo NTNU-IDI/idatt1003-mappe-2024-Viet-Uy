@@ -260,34 +260,33 @@ public class FoodStorage {
    * @param filename the name of the file you want to load ingredients from.
    */
   public void loadIngredientsFromFile(String filename) {
-    ingredients.clear();
-    
-    String regex = "name='(.*?)', unit='(.*?)', numberOfUnits=(\\d+), price=(\\d+\\.\\d+),"
-        + " expirationDate=(\\d{4}-\\d{2}-\\d{2})"; //Regex pattern to match the line
-    Pattern pattern = Pattern.compile(regex); //Compiling the pattern to be used in the matcher
+    URL resourceUrl = getClass().getClassLoader().getResource(filename);
 
-    //Getting the resource path:
-    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename)) { 
-      if (inputStream == null) {
-        logger.log(Level.SEVERE, "File not found: " + filename);
-        return;
-      }
-      //Reading the file
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) { 
-        String line;
-        while ((line = reader.readLine()) != null) { //Reading the file line by line
-          Matcher matcher = pattern.matcher(line); //Matching the pattern with the line
-          if (matcher.find()) {
-            Ingredient ingredient = getIngredient(matcher);
-            ingredients.add(ingredient); //Adding the ingredient to the list
-          }
+    if (resourceUrl == null) {
+      System.err.println("Resource path is null");
+      return;
+    }
+    String filePath = resourceUrl.getPath();
+
+    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+      String line;
+      Pattern pattern = Pattern.compile("Ingredient\\{name='(.+)', unit='(.+)', numberOfUnits=(\\d+), price=(\\d+\\.\\d+), expirationDate=(\\d{4}-\\d{2}-\\d{2})\\}");
+      while ((line = reader.readLine()) != null) {
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.matches()) {
+          String name = matcher.group(1);
+          String unit = matcher.group(2);
+          int numberOfUnits = Integer.parseInt(matcher.group(3));
+          double price = Double.parseDouble(matcher.group(4));
+          LocalDate expirationDate = LocalDate.parse(matcher.group(5));
+          ingredients.add(new Ingredient(name, unit, numberOfUnits, price, expirationDate));
         }
       }
     } catch (IOException e) {
-      logger.log(Level.SEVERE, "Could not load ingredients from file", e);
+      System.err.println("Could not read ingredients from file: " + e.getMessage());
     }
 
-    ingredients.sort(Comparator.comparing((Ingredient::getName))); //Sorting the ingredients by name
+    ingredients.sort(Comparator.comparing(Ingredient::getName));
 
     System.out.printf("%-20s %-20s %-10s %-10s %-15s%n", "Name", "Number of Units",
         "Unit", "Price", "Expiration Date");
@@ -303,7 +302,6 @@ public class FoodStorage {
     }
     System.out.println("-----------------------------------------------"
         + "---------------------------------------\n");
-
   }
   /**
    * Gets the ingredient object. specifically used in the loadIngredientsFromFile method.
@@ -324,6 +322,21 @@ public class FoodStorage {
   }
 
   /**
+   * Gets the full ingredient. This is used to get the full ingredient object.
+   *
+   * @param name the name of the ingredient.
+   * @return the ingredient object.
+   */
+  public Ingredient getFullIngredient(String name) {
+    for (Ingredient ingredient : ingredients) {
+      if (ingredient.getName().equalsIgnoreCase(name)) {
+        return ingredient;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Gets the ingredient by name. This the function used to get the ingredient info. in the menu.
    *
    * @param name the name of the ingredient.
@@ -335,11 +348,12 @@ public class FoodStorage {
       //Checking if the name is equal to the name of the ingredient:
       if (ingredient.getName().equalsIgnoreCase(name)) {
         return new IngredientInfo(ingredient.getName(),
-            ingredient.getNumberOfItems(), ingredient.getUnit()); //Returning the ingredient info
+            ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()); //Returning the ingredient info
       }
     }
     return null;
   }
+
 
   /**
    * Used for testing purposes in the test class.

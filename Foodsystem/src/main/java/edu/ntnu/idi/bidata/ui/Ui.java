@@ -55,7 +55,7 @@ public class Ui {
             break;
           case 5:
             System.out.println("Add recipes to the cooking book:");
-            cookBook.addRecipe(scanner);
+            cookBook.addRecipe(scanner, foodStorage);
             break;
           case 6:
             System.out.println("Showing recipes");
