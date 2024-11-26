@@ -47,6 +47,7 @@ public class Ui {
             break;
           case 3:
             System.out.println("Showing all ingredients");
+            foodStorage.clearIngredients(); // Clear the ingredients
             foodStorage.loadIngredientsFromFile("ingredients.txt");
             break;
           case 4:
@@ -62,7 +63,7 @@ public class Ui {
             cookBook.showRecipe();
             break;
           case 7:
-            System.out.println("Recommend dishes based of current ingredients");
+            System.out.println("Recommend dishes based of these current ingredients: ");
             cookBook.suggestRecipes(foodStorage, "recipes.txt");
             break;
           case 8:

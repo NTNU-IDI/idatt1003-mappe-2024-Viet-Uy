@@ -1,7 +1,5 @@
 package edu.ntnu.idi.bidata;
 
-
-
 /**
  * Ingredients class, this is where ingredients are to be added and stored.
  */

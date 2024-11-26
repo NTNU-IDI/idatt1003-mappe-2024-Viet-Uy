@@ -202,18 +202,9 @@ public class CookBook {
 
     try (BufferedReader reader = new BufferedReader(
         new FileReader(filePath))) { // Try to read from the file
-      boolean firstLine = true;
       String line;
       while ((line = reader.readLine()) != null) { // Read each line
-        if (line.trim().isEmpty()) { // If the line is empty, print a new line
-          if (!firstLine) { // If it is not the first line, print a new line
-            System.out.println();
-          }
-          firstLine = false;
-        } else {
-          System.out.println(line);
-          firstLine = true;
-        }
+        System.out.println(line); // Print the line
       }
     } catch (IOException e) {
       logger.log(Level.SEVERE, "Could not read recipes from file", e);
@@ -228,6 +219,9 @@ public class CookBook {
    */
   public void suggestRecipes(FoodStorage foodStorage, String filename) {
     try {
+      // Load ingredients from file before suggesting recipes
+      foodStorage.loadIngredientsFromFile("ingredients.txt");
+
       loadRecipesFromFile(filename);
 
       ArrayList<Recipe> suggestedRecipes = new ArrayList<>();
@@ -236,7 +230,6 @@ public class CookBook {
       for (Recipe recipe : recipes.values()) {
         boolean canMakeRecipe = true;
         double totalPrice = 0.0;
-
         for (IngredientInfo ingredient : recipe.ingredients()) {
           IngredientInfo availableIngredient = foodStorage.getIngredients(ingredient.getName());
           if (availableIngredient == null
@@ -264,7 +257,7 @@ public class CookBook {
       } else {
         System.out.println("You can make the following recipes:");
         for (Recipe recipe : suggestedRecipes) {
-          System.out.println(recipe.name());
+          System.out.println("\u001B[32m" + recipe.name() + "\u001B[0m" + "\n");
         }
       }
     } catch (Exception e) {

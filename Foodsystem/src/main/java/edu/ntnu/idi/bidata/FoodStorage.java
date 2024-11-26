@@ -303,38 +303,6 @@ public class FoodStorage {
     System.out.println("-----------------------------------------------"
         + "---------------------------------------\n");
   }
-  /**
-   * Gets the ingredient object. specifically used in the loadIngredientsFromFile method.
-   *
-   * @param matcher the matcher object to match the regex pattern.
-   * @return the ingredient object.
-   */
-
-  private static Ingredient getIngredient(Matcher matcher) {
-    String name = matcher.group(1); //Getting the name of the ingredient
-    String unit = matcher.group(2); //Getting the unit of the ingredient
-    int numberOfItems = Integer.parseInt(matcher.group(3)); //Getting the number of units
-    double price = Double.parseDouble(matcher.group(4)); //Getting the price of the ingredient
-    LocalDate expirationDate = LocalDate.parse(matcher.group(5)); //Getting the expiration date
-    //Creating a new ingredient
-    return new Ingredient(name, unit, numberOfItems,
-        price, expirationDate);
-  }
-
-  /**
-   * Gets the full ingredient. This is used to get the full ingredient object.
-   *
-   * @param name the name of the ingredient.
-   * @return the ingredient object.
-   */
-  public Ingredient getFullIngredient(String name) {
-    for (Ingredient ingredient : ingredients) {
-      if (ingredient.getName().equalsIgnoreCase(name)) {
-        return ingredient;
-      }
-    }
-    return null;
-  }
 
   /**
    * Gets the ingredient by name. This the function used to get the ingredient info. in the menu.
@@ -344,25 +312,17 @@ public class FoodStorage {
    */
 
   public IngredientInfo getIngredients(String name) {
+
     for (Ingredient ingredient : ingredients) { //Iterating through the ingredients
       //Checking if the name is equal to the name of the ingredient:
       if (ingredient.getName().equalsIgnoreCase(name)) {
+
         return new IngredientInfo(ingredient.getName(),
             ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()); //Returning the ingredient info
       }
     }
+    System.out.println("No matching ingredient found for: " + name);
     return null;
-  }
-
-
-  /**
-   * Used for testing purposes in the test class.
-   *
-   * @return the list of ingredients.
-   */
-
-  public List<Ingredient> getIngredients() {
-    return ingredients;
   }
 
   /**
@@ -396,4 +356,12 @@ public class FoodStorage {
       logger.log(Level.SEVERE, "Error while checking expired goods", e);
     }
   }
+
+  /**
+   * Clears the ingredients list.
+   */
+  public void clearIngredients() {
+    ingredients.clear();
+  }
+
 }
