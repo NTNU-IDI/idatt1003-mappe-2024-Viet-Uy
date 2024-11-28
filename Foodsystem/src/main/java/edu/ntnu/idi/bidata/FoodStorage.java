@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.time.LocalDate;
@@ -20,8 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
 
 /**
  * Class for storing food ingredients.
@@ -83,7 +79,6 @@ public class FoodStorage {
         double price;
         try {
           price = Double.parseDouble(priceInput);
-          // Continue with the rest of your code
         } catch (NumberFormatException e) {
           System.out.println("Invalid price. Please enter a valid number.");
           return;
@@ -269,19 +264,20 @@ public class FoodStorage {
     String filePath = resourceUrl.getPath();
 
     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-      String line;
-      Pattern pattern = Pattern.compile("Ingredient\\{name='(.+)', unit='(.+)', numberOfUnits=(\\d+), price=(\\d+\\.\\d+), expirationDate=(\\d{4}-\\d{2}-\\d{2})\\}");
-      while ((line = reader.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line);
-        if (matcher.matches()) {
-          String name = matcher.group(1);
-          String unit = matcher.group(2);
-          int numberOfUnits = Integer.parseInt(matcher.group(3));
-          double price = Double.parseDouble(matcher.group(4));
-          LocalDate expirationDate = LocalDate.parse(matcher.group(5));
-          ingredients.add(new Ingredient(name, unit, numberOfUnits, price, expirationDate));
-        }
-      }
+      String regex = "Ingredient\\{name='(.+)', unit='(.+)', numberOfUnits=(\\d+), "
+              + "price=(\\d+\\.\\d+), expirationDate=(\\d{4}-\\d{2}-\\d{2})}";
+      Pattern pattern = Pattern.compile(regex);
+      ingredients.addAll(reader.lines()
+              .map(pattern::matcher)
+              .filter(Matcher::matches)
+              .map(matcher -> new Ingredient(
+                      matcher.group(1),
+                      matcher.group(2),
+                      Integer.parseInt(matcher.group(3)),
+                      Double.parseDouble(matcher.group(4)),
+                      LocalDate.parse(matcher.group(5))
+              ))
+              .toList());
     } catch (IOException e) {
       System.err.println("Could not read ingredients from file: " + e.getMessage());
     }
@@ -292,16 +288,14 @@ public class FoodStorage {
         "Unit", "Price", "Expiration Date");
     System.out.println("-----------------------------------------------"
         + "---------------------------------------");
-    for (Ingredient ingredient : ingredients) {
-      System.out.printf("%-20s %-20d %-10s %-10.2f %-15s%n",
-          ingredient.getName(),
-          ingredient.getNumberOfItems(),
-          ingredient.getUnit(),
-          ingredient.getPrice(),
-          ingredient.getExpirationDate());
-    }
+    ingredients.forEach(ingredient -> System.out.printf("%-20s %-20d %-10s %-10.2f %-15s%n",
+            ingredient.getName(),
+            ingredient.getNumberOfItems(),
+            ingredient.getUnit(),
+            ingredient.getPrice(),
+            ingredient.getExpirationDate()));
     System.out.println("-----------------------------------------------"
-        + "---------------------------------------\n");
+            + "---------------------------------------\n");
   }
 
   /**
@@ -312,17 +306,12 @@ public class FoodStorage {
    */
 
   public IngredientInfo getIngredients(String name) {
-
-    for (Ingredient ingredient : ingredients) { //Iterating through the ingredients
-      //Checking if the name is equal to the name of the ingredient:
-      if (ingredient.getName().equalsIgnoreCase(name)) {
-
-        return new IngredientInfo(ingredient.getName(),
-            ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()); //Returning the ingredient info
-      }
-    }
-    System.out.println("No matching ingredient found for: " + name);
-    return null;
+    return ingredients.stream()
+            .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .map(ingredient -> new IngredientInfo(ingredient.getName(),
+                    ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()))
+            .orElse(null);
   }
 
   /**
@@ -331,27 +320,22 @@ public class FoodStorage {
   public void expiredGoods() {
     try {
       loadIngredientsFromFile("ingredients.txt"); // Loading the ingredients from the file
-      final String Red = "\u001B[31m"; // Red color
-      final String Reset = "\u001B[0m"; // Reset color
-
       System.out.println("Expired goods: ");
       System.out.printf("%-20s %-20s %-10s %-10s %-15s%n", "Name", "Number of Units",
           "Unit", "Price", "Expiration Date");
       System.out.println("-----------------------------------------------"
           + "---------------------------------------");
-      for (Ingredient ingredient : ingredients) {
-        // Checking if the ingredient is expired:
-        if (ingredient.getExpirationDate().isBefore(LocalDate.now())) {
-          System.out.printf("%-20s %-20d %-10s %-10.2f " + Red + "%-15s" + Reset + "%n",
-              ingredient.getName(),
-              ingredient.getNumberOfItems(),
-              ingredient.getUnit(),
-              ingredient.getPrice(),
-              ingredient.getExpirationDate());
-        }
-      }
+      String coloredText = "\"%-20s %-20d %-10s %-10.2f \" + Red + \"%-15s\" + Reset + \"%n\"";
+      ingredients.stream()
+              .filter(ingredient -> ingredient.getExpirationDate().isBefore(LocalDate.now()))
+              .forEach(ingredient -> System.out.printf(coloredText,
+                      ingredient.getName(),
+                      ingredient.getNumberOfItems(),
+                      ingredient.getUnit(),
+                      ingredient.getPrice(),
+                      ingredient.getExpirationDate()));
       System.out.println("-----------------------------------------------"
-          + "---------------------------------------\n");
+              + "---------------------------------------\n");
     } catch (Exception e) {
       logger.log(Level.SEVERE, "Error while checking expired goods", e);
     }

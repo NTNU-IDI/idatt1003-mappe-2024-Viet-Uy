@@ -22,7 +22,6 @@ class CookBookTest {
         HashMap<String, IngredientInfo> ingredients = new HashMap<>();
         cookBook = new CookBook("TestCookBook", ingredients, "TestInstructions");
         ArrayList<IngredientInfo> ingredientList = new ArrayList<>();
-        ingredientList.add(new IngredientInfo("Apple", 2, "Pieces"));
         recipe = new Recipe("Apple Pie", "Mix and bake", ingredientList, 4);
     }
 

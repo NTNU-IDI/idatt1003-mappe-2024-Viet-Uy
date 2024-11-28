@@ -27,7 +27,6 @@ public String toString() {
     sb.append("Number of people: ").append(numberOfPeople)
         .append("\n"); // Add the number of people to the StringBuilder
     return sb.toString(); // Return the string representation of the StringBuilder
-}
-
+  }
 
 }

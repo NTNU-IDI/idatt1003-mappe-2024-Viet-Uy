@@ -1,9 +1,9 @@
 package edu.ntnu.idi.bidata.ui;
 
-import edu.ntnu.idi.bidata.FoodStorage;
 import edu.ntnu.idi.bidata.CookBook;
-import java.util.InputMismatchException;
+import edu.ntnu.idi.bidata.FoodStorage;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 
@@ -32,7 +32,17 @@ public class Ui {
   public void start() {
     boolean checker = true;
     while (checker) {
-      String choices = "\n1:Add ingredient\n2:Remove ingredient\n3:Show all ingredients\n4:Expired goods \n5:Add recipe \n6:Show recipe \n7:Recommend dishes based of current ingredients  \n8:Exit";
+      String choices = """
+              
+              1:Add ingredient
+              2:Remove ingredient
+              3:Show all ingredients\
+              
+              4:Expired goods\s
+              5:Add recipe\s
+              6:Show recipe\s
+              7:Recommend dishes based of current ingredients \s
+              8:Exit""";
       System.out.println("What do you want to do?" + choices);
       try {
         int choice = scanner.nextInt();
@@ -56,7 +66,7 @@ public class Ui {
             break;
           case 5:
             System.out.println("Add recipes to the cooking book:");
-            cookBook.addRecipe(scanner, foodStorage);
+            cookBook.addRecipe(scanner);
             break;
           case 6:
             System.out.println("Showing recipes");

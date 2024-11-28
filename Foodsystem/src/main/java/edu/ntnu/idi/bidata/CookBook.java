@@ -84,7 +84,7 @@ public class CookBook {
    *
    * @param scanner the scanner object to read input from the user.
    */
-  public void addRecipe(Scanner scanner, FoodStorage foodStorage) {
+  public void addRecipe(Scanner scanner) {
     // ArrayList to store ingredients
     ArrayList<IngredientInfo> ingredients = new ArrayList<>(getIngredients().values());
     boolean checker = true;
@@ -221,7 +221,6 @@ public class CookBook {
     try {
       // Load ingredients from file before suggesting recipes
       foodStorage.loadIngredientsFromFile("ingredients.txt");
-
       loadRecipesFromFile(filename);
 
       ArrayList<Recipe> suggestedRecipes = new ArrayList<>();
@@ -231,18 +230,17 @@ public class CookBook {
         boolean canMakeRecipe = true;
         double totalPrice = 0.0;
         for (IngredientInfo ingredient : recipe.ingredients()) {
-          IngredientInfo availableIngredient = foodStorage.getIngredients(ingredient.getName());
+          IngredientInfo availableIngredient = foodStorage.getIngredients(ingredient.name());
           if (availableIngredient == null
-              || availableIngredient.getAmount() < ingredient.getAmount()
-              || !availableIngredient.getUnit().equals(ingredient.getUnit())) {
+              || availableIngredient.amount() < ingredient.amount()
+              || !availableIngredient.unit().equals(ingredient.unit())) {
             canMakeRecipe = false;
             break;
           } else {
-
-            double ingredientPrice = availableIngredient.getPrice();
+            double ingredientPrice = availableIngredient.price();
             totalPrice += ingredientPrice;
             System.out.printf("Ingredient: %s, Amount: %d, Subtotal: %.2f%n",
-                ingredient.getName(), ingredient.getAmount(), ingredientPrice);
+                ingredient.name(), ingredient.amount(), ingredientPrice);
           }
         }
         if (canMakeRecipe) {
@@ -260,10 +258,13 @@ public class CookBook {
           System.out.println("\u001B[32m" + recipe.name() + "\u001B[0m" + "\n");
         }
       }
+
     } catch (Exception e) {
       logger.log(Level.SEVERE, "An error occurred while suggesting recipes", e);
     }
   }
+
+
 
   /**
    * Loads recipes from a file.
@@ -290,24 +291,34 @@ public class CookBook {
       Pattern pattern = Pattern.compile(
           "Recipe Name: (.+)|Ingredient: (.+), Amount: (\\d+) (.+), Price: (\\d+\\.\\d+)|"
               + "Instructions: (.+)|Number of people: (\\d+)");
+
+
       while ((line = reader.readLine()) != null) {
+        // Match the current line against the pattern
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
+          // Check if the first group (recipe name) is not null
           if (matcher.group(1) != null) {
+            // If there is an existing recipe name, add the current recipe to the map
             if (recipeName != null) {
-              recipes.put(recipeName,
-                  new Recipe(recipeName, instructions, ingredients, numberOfPeople));
+              recipes.put(recipeName, new Recipe(recipeName, instructions,
+                      ingredients, numberOfPeople));
             }
+            // Set the new recipe name and initialize the ingredients list
             recipeName = matcher.group(1);
             ingredients = new ArrayList<>();
+            // Check if the third group (ingredient details) is not null:
           } else if (matcher.group(3) != null) {
             String ingredientName = matcher.group(2);
             int amount = Integer.parseInt(matcher.group(3));
             String unit = matcher.group(4);
             double price = Double.parseDouble(matcher.group(5));
+            // Add the ingredient to the ingredients list
             ingredients.add(new IngredientInfo(ingredientName, amount, unit, price));
+            // Check if the sixth group (instructions) is not null:
           } else if (matcher.group(6) != null) {
             instructions = matcher.group(6);
+            // Check if the seventh group (number of people) is not null:
           } else if (matcher.group(7) != null) {
             numberOfPeople = Integer.parseInt(matcher.group(7));
           }
