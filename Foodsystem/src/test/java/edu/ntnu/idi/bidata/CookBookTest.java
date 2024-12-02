@@ -25,6 +25,7 @@ class CookBookTest {
         recipe = new Recipe("Apple Pie", "Mix and bake", ingredientList, 4);
     }
 
+
     @Test
     void testAddRecipePositive() {
         cookBook.addRecipe(new Scanner("Apple Pie\nApple\n3\n2\nPieces\nno\nMix and bake\n4\n"));

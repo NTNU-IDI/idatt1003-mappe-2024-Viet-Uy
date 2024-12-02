@@ -15,6 +15,23 @@ public record IngredientInfo(String name, int amount, String unit, double price)
   public IngredientInfo {
   }
 
+  public int getNumberOfItems() {
+    return amount;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public double getPrice() {
+    return price;
+  }
+
+
+  public String getUnit() {
+    return unit;
+  }
+
   /**
    * Gets name of ingredient.
    */
@@ -27,5 +44,7 @@ public record IngredientInfo(String name, int amount, String unit, double price)
   public String toString() {
     return "Ingredient: " + name + ", Amount: " + amount + " " + unit + ", Price: " + price;
   }
+
+
 
 }

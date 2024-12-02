@@ -36,6 +36,11 @@ public class FoodStorage {
 
   }
 
+  public List<Ingredient> getIngredientsList() {
+    return new ArrayList<>(ingredients); // Return a copy to avoid modification outside the class
+  }
+
+
   /**
    * Adds ingredients to the list of ingredients.
    *
@@ -255,6 +260,7 @@ public class FoodStorage {
    * @param filename the name of the file you want to load ingredients from.
    */
   public void loadIngredientsFromFile(String filename) {
+    ingredients.clear();
     URL resourceUrl = getClass().getClassLoader().getResource(filename);
 
     if (resourceUrl == null) {

@@ -70,10 +70,10 @@ public class Ui {
             break;
           case 6:
             System.out.println("Showing recipes");
-            cookBook.showRecipe();
+            cookBook.showRecipe("recipes.txt");
             break;
           case 7:
-            System.out.println("Recommend dishes based of these current ingredients: ");
+            System.out.println("Recommend dishes based of these current ingredients: \n");
             cookBook.suggestRecipes(foodStorage, "recipes.txt");
             break;
           case 8:
