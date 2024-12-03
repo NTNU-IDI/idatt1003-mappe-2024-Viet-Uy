@@ -40,6 +40,24 @@ public class FoodStorage {
     return new ArrayList<>(ingredients); // Return a copy to avoid modification outside the class
   }
 
+  /**
+   * Checks if an ingredient exists in the list of ingredients. Used for testing purposes.
+   *
+   * @param name the name of the ingredient.
+   * @return true if the ingredient exists, false otherwise.
+   */
+  public boolean ingredientExists(String name) {
+    return ingredients.stream().anyMatch(ingredient -> ingredient.getName().equalsIgnoreCase(name));
+  }
+
+  /**
+   * Adds ingredients directly to the list of ingredients, without having to go through the scanner.
+   *
+   * @param ingredient the ingredient to be added.
+   */
+  public void addIngredientDirectly(Ingredient ingredient) {
+    ingredients.add(ingredient);
+  }
 
   /**
    * Adds ingredients to the list of ingredients.

@@ -13,12 +13,15 @@ import java.util.logging.Logger;
  * A class to handle file operations.
  */
 public class FileHandler {
+
   private static final Logger logger = Logger.getLogger(FileHandler.class.getName());
 
   // Private constructor to prevent instantiation
   private FileHandler() {
     throw new UnsupportedOperationException("Utility class");
   }
+
+
 
   /**
    * Get the path of a resource file.

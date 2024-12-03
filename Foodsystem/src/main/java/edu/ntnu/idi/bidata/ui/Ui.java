@@ -2,6 +2,7 @@ package edu.ntnu.idi.bidata.ui;
 
 import edu.ntnu.idi.bidata.CookBook;
 import edu.ntnu.idi.bidata.FoodStorage;
+import edu.ntnu.idi.bidata.RecipeManager;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -14,6 +15,7 @@ public class Ui {
   private FoodStorage foodStorage;
   private Scanner scanner;
   private CookBook cookBook;
+
 
   /**
    * Initialize the user interface.
@@ -30,6 +32,7 @@ public class Ui {
    * Start the user interface.
    */
   public void start() {
+
     boolean checker = true;
     while (checker) {
       String choices = """
