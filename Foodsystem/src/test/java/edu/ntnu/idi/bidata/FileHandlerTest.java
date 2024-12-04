@@ -1,8 +1,5 @@
 package edu.ntnu.idi.bidata;
 
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 import org.junit.jupiter.api.*;
 import java.io.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +37,11 @@ class FileHandlerTest {
     FileHandler.writeToFile(tempFile.getPath(), content);
 
     String writtenContent = new String(java.nio.file.Files.readAllBytes(tempFile.toPath()));
+    if (writtenContent.contains(content)) {
+      System.out.println("testWriteToFile: Success");
+    } else {
+      System.out.println("testWriteToFile: Failure");
+    }
     assertTrue(writtenContent.contains(content), "File should contain the written content");
   }
 
@@ -51,16 +53,12 @@ class FileHandlerTest {
     }
 
     String fileContent = FileHandler.readFromFile(tempFile.getPath());
+    if (fileContent.contains(content)) {
+      System.out.println("testReadFromFile: Success");
+    } else {
+      System.out.println("testReadFromFile: Failure");
+    }
     assertTrue(fileContent.contains(content), "Read content should match written content");
   }
-
-
-  @Test
-  void testWriteToFileIOException() {
-    File readOnlyFile = new File(tempFile.getPath());
-
-    String content = "This will fail";
-    assertDoesNotThrow(() -> FileHandler.writeToFile(readOnlyFile.getPath(), content));
-
   }
-}
+

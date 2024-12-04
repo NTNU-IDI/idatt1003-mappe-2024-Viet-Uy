@@ -14,19 +14,19 @@ public record Recipe(String name, String instructions, ArrayList<IngredientInfo>
   @Override
 public String toString() {
     StringBuilder sb =
-        new StringBuilder(); // StringBuilder is used to concatenate strings efficiently
+        new StringBuilder();
     sb.append("Recipe Name: ").append(name)
-        .append("\n"); // append() is used to add strings to the StringBuilder
-    sb.append("Ingredients:\n"); // \n is used to add a newline character
-    for (IngredientInfo ingredient : ingredients) { // Loop through all ingredients
+        .append("\n");
+    sb.append("Ingredients:\n");
+    for (IngredientInfo ingredient : ingredients) {
       sb.append(ingredient.toString()).append(
-          "\n"); // Add the string representation of the ingredient to the StringBuilder
+          "\n");
     }
     sb.append("Instructions: ").append(instructions)
-        .append("\n"); // Add the instructions to the StringBuilder
+        .append("\n");
     sb.append("Number of people: ").append(numberOfPeople)
-        .append("\n"); // Add the number of people to the StringBuilder
-    return sb.toString(); // Return the string representation of the StringBuilder
+        .append("\n");
+    return sb.toString();
   }
 
 }

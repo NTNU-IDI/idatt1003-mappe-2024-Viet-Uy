@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -69,7 +68,11 @@ public class FoodStorage {
     while (loop) {
       try {
         System.out.println("Whats your ingredient name?");
-        final String name = scanner.nextLine();
+        final String name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+          System.out.println("Ingredient name cannot be empty.");
+          continue;
+        }
 
         System.out.println("What unit? \n 1. Gram \n 2. Liter \n 3. Pieces");
         final String unitType = scanner.nextLine();
@@ -79,22 +82,26 @@ public class FoodStorage {
           case "3" -> "Pieces";
           default ->
             {
-            System.out.println("Invalid choice");
+            System.out.println("Invalid choice. Please enter 1, 2, or 3.");
             yield null;
             }
         };
 
         if (unit == null) {
-          return;
+          continue;
         }
 
         System.out.println("How many " + unit + " do you have?");
         int numberOfUnits;
         try {
-          numberOfUnits = Integer.parseInt(scanner.nextLine());
+          numberOfUnits = Integer.parseInt(scanner.nextLine().trim());
+          if (numberOfUnits <= 0) {
+            System.out.println("Number of units must be a positive integer.");
+            continue;
+          }
         } catch (NumberFormatException e) {
           System.out.println("Invalid number of units. Please enter a valid integer.");
-          return;
+          continue;
         }
 
         System.out.println("What price? Just the number");
@@ -102,19 +109,23 @@ public class FoodStorage {
         double price;
         try {
           price = Double.parseDouble(priceInput);
+          if (price <= 0) {
+            System.out.println("Price must be a positive number.");
+            continue;
+          }
         } catch (NumberFormatException e) {
           System.out.println("Invalid price. Please enter a valid number.");
           return;
         }
 
         System.out.println("What is the expiration date? (YYYY-MM-DD)");
-        final String dateInput = scanner.nextLine();
+        final String dateInput = scanner.nextLine().trim();
         LocalDate expirationDate;
         try {
           expirationDate = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
         } catch (Exception e) {
-          System.out.println("Invalid date format");
-          return;
+          System.out.println("Invalid date format. Please enter a date in the format YYYY-MM-DD.");
+          continue;
         }
 
         Ingredient ingredient = new Ingredient(name, unit, numberOfUnits, price, expirationDate);
@@ -139,14 +150,26 @@ public class FoodStorage {
     FoodStorage foodStorage = new FoodStorage();
     foodStorage.loadIngredientsFromFile(filename);
     System.out.println("Enter the name of the ingredient you want to remove: ");
-    String name = scanner.nextLine();
+    String name = scanner.nextLine().trim();
+
+    if (name.isEmpty()) {
+      System.out.println("Ingredient name cannot be empty.");
+      return;
+    }
+
+    if (!ingredientExists(name)) {
+      System.out.println("Ingredient not found.");
+      return;
+    }
 
     URL resourceUrl = getClass().getClassLoader().getResource(filename); //Getting the resource path
     if (resourceUrl == null) {
       logger.log(Level.SEVERE, "Resource path is null");
       return;
     }
+
     String filePath = resourceUrl.getPath(); //Getting the path of the file
+
     try (BufferedReader br = new BufferedReader(new FileReader(filePath))) { //Reading the file
       String line;
       while ((line = br.readLine()) != null) {
@@ -161,12 +184,14 @@ public class FoodStorage {
               System.out.println("How many units do you want to remove? (0 to remove all)");
               int unitsToRemove;
               try {
-                unitsToRemove = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline
-              } catch (InputMismatchException e) {
+                unitsToRemove = Integer.parseInt(scanner.nextLine().trim());
+                if (unitsToRemove < 0) {
+                  System.out.println("Number of units must be a positive integer.");
+                  continue;
+                }
+              } catch (NumberFormatException e) {
                 System.out.println("Invalid number of units. Please enter a valid integer.");
-                scanner.nextLine(); // Consume the invalid input
-                return;
+                continue;
               }
               removeLineFromFile(line, unitsToRemove);
               System.out.println("Ingredient removed!");
@@ -177,13 +202,18 @@ public class FoodStorage {
             }
           }
         }
-
       }
     } catch (IOException e) {
       System.out.println("Error");
     }
   }
 
+  /**
+   * Removes a line from a file.
+   *
+   * @param lineToRemove the line to remove.
+   * @param unitsToRemove the number of units to remove.
+   */
   private void removeLineFromFile(String lineToRemove, int unitsToRemove) {
 
     String tempFile = "temp.txt";

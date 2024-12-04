@@ -40,10 +40,22 @@ public class RecipeManager {
     System.out.println("Enter the name of the recipe: ");
     final String recipeName = scanner.nextLine();
 
+    if (recipeName.isEmpty()) {
+      System.out.println("Recipe name cannot be empty.");
+      return;
+    }
+
+
     while (checker) {
       try {
         System.out.println("Enter the ingredient name: ");
         final String ingredientName = scanner.nextLine();
+
+        if (ingredientName.isEmpty()) {
+          System.out.println("Ingredient name cannot be empty.");
+          continue;
+        }
+
         System.out.println("What unit? \n 1. Gram \n 2. Liter \n 3. Pieces");
         String unitType = scanner.nextLine();
         String unit = switch (unitType) {
@@ -52,7 +64,7 @@ public class RecipeManager {
           case "3" -> "Pieces";
           default ->
             {
-            System.out.println("Invalid choice");
+            System.out.println("Invalid choice. Please enter 1, 2, or 3.");
             yield null;
             }
         };
@@ -65,6 +77,10 @@ public class RecipeManager {
         int amount;
         try {
           amount = Integer.parseInt(scanner.nextLine());
+          if (amount <= 0) {
+            System.out.println("Amount must be a positive integer.");
+            continue;
+          }
         } catch (NumberFormatException e) {
           System.out.println("Invalid amount. Please enter a valid integer.");
           continue;
@@ -74,6 +90,10 @@ public class RecipeManager {
         double price;
         try {
           price = Double.parseDouble(scanner.nextLine());
+          if (price <= 0) {
+            System.out.println("Price must be a positive number.");
+            continue;
+          }
         } catch (NumberFormatException e) {
           System.out.println("Invalid price. Please enter a valid number.");
           continue;
@@ -101,42 +121,22 @@ public class RecipeManager {
     }
 
     System.out.println("Enter the number of people: ");
-    int numberOfPeople = scanner.nextInt();
-    scanner.nextLine();
+    int numberOfPeople;
+    try {
+      numberOfPeople = Integer.parseInt(scanner.nextLine().trim());
+      if (numberOfPeople <= 0) {
+        System.out.println("Number of people must be a positive integer.");
+        return;
+      }
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid number of people. Please enter a valid integer.");
+      return;
+    }
     String filePath = FileHandler.getResourcePath("recipes.txt");
     Recipe recipe = new Recipe(recipeName, recipeInstructions, ingredientList, numberOfPeople);
     recipes.put(recipeName, recipe);
     FileHandler.writeToFile(filePath, recipe.toString());
 
-  }
-
-  /**
-   * Remove a recipe from the recipe manager.
-   *
-   * @param name the name of the recipe to remove.
-   */
-  public void removeRecipe(String name) {
-    recipes.remove(name);
-  }
-
-  /**
-   * Check if a recipe is in the recipe manager.
-   *
-   * @param name the name of the recipe to check.
-   * @return true if the recipe is in the recipe manager, false otherwise.
-   */
-  public boolean containsRecipe(String name) {
-    return recipes.containsKey(name);
-  }
-
-  /**
-   * Get a recipe from the recipe manager.
-   *
-   * @param name the name of the recipe to get.
-   * @return the recipe with the given name, or null if no such recipe exists.
-   */
-  public Recipe getRecipe(String name) {
-    return recipes.get(name);
   }
 
   /**

@@ -12,6 +12,7 @@ public class CookBook {
   private final HashMap<String, IngredientInfo> ingredients;
   private final String instructions;
 
+
   /**
    * Create a new CookBook.
    *
@@ -40,35 +41,6 @@ public class CookBook {
   }
 
   /**
-   * Remove a recipe from the cookbook.
-   *
-   * @param name the name of the recipe to remove.
-   */
-  public void removeRecipe(String name) {
-    recipeManager.removeRecipe(name);
-  }
-
-  /**
-   * Check if the cookbook contains a recipe.
-   *
-   * @param name the name of the recipe to check.
-   * @return true if the cookbook contains the recipe, false otherwise.
-   */
-  public boolean containsRecipe(String name) {
-    return recipeManager.containsRecipe(name);
-  }
-
-  /**
-   * Get a recipe from the cookbook.
-   *
-   * @param name the name of the recipe to get.
-   * @return the recipe with the given name, or null if no such recipe exists.
-   */
-  public Recipe getRecipe(String name) {
-    return recipeManager.getRecipe(name);
-  }
-
-  /**
    * Show all recipes in the cookbook.
    */
   public void showRecipe(String filename) {
@@ -85,6 +57,7 @@ public class CookBook {
     recipeManager.suggestRecipes(foodStorage, filename);
   }
 
+  //Returns the toString method of recipeManager to display the recipes in the cookbook
   @Override
   public String toString() {
     return recipeManager.toString();

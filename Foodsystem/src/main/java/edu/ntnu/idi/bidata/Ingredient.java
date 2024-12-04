@@ -36,6 +36,7 @@ public class Ingredient {
     this.expirationDate = expirationDate;
   }
 
+
   @Override
     public String toString() {
     //an override toString method where we convert from object to string
@@ -48,6 +49,9 @@ public class Ingredient {
             + '}';
   }
 
+  /**
+   * Gets name of ingredient.
+   */
   public String getName() {
     return name;
   }

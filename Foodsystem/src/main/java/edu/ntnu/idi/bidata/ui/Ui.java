@@ -2,7 +2,6 @@ package edu.ntnu.idi.bidata.ui;
 
 import edu.ntnu.idi.bidata.CookBook;
 import edu.ntnu.idi.bidata.FoodStorage;
-import edu.ntnu.idi.bidata.RecipeManager;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -12,6 +11,15 @@ import java.util.Scanner;
  * Console user interface for the food system.
  */
 public class Ui {
+  private static final int ADD_INGREDIENT = 1;
+  private static final int REMOVE_INGREDIENT = 2;
+  private static final int SHOW_ALL_INGREDIENTS = 3;
+  private static final int EXPIRED_GOODS = 4;
+  private static final int ADD_RECIPE = 5;
+  private static final int SHOW_RECIPE = 6;
+  private static final int RECOMMEND_DISHES = 7;
+  private static final int EXIT = 8;
+
   private FoodStorage foodStorage;
   private Scanner scanner;
   private CookBook cookBook;
@@ -32,65 +40,85 @@ public class Ui {
    * Start the user interface.
    */
   public void start() {
-
     boolean checker = true;
     while (checker) {
-      String choices = """
-              
-              1:Add ingredient
-              2:Remove ingredient
-              3:Show all ingredients\
-              
-              4:Expired goods\s
-              5:Add recipe\s
-              6:Show recipe\s
-              7:Recommend dishes based of current ingredients \s
-              8:Exit""";
-      System.out.println("What do you want to do?" + choices);
+      displayMenu();
       try {
         int choice = scanner.nextInt();
         scanner.nextLine();
-        switch (choice) {
-          case 1:
-            foodStorage.addIngredient(scanner);
-            break;
-          case 2:
-            System.out.println("Removing ingredient");
-            foodStorage.removeIngredient(scanner);
-            break;
-          case 3:
-            System.out.println("Showing all ingredients");
-            foodStorage.clearIngredients(); // Clear the ingredients
-            foodStorage.loadIngredientsFromFile("ingredients.txt");
-            break;
-          case 4:
-            System.out.println("Food storage: ");
-            foodStorage.expiredGoods();
-            break;
-          case 5:
-            System.out.println("Add recipes to the cooking book:");
-            cookBook.addRecipe(scanner);
-            break;
-          case 6:
-            System.out.println("Showing recipes");
-            cookBook.showRecipe("recipes.txt");
-            break;
-          case 7:
-            System.out.println("Recommend dishes based of these current ingredients: \n");
-            cookBook.suggestRecipes(foodStorage, "recipes.txt");
-            break;
-          case 8:
-            checker = false;
-            System.out.println("Exiting");
-            break;
-          default:
-            System.out.println("Invalid choice");
-        }
+        checker = handleMenuChoice(choice);
       } catch (InputMismatchException e) {
         System.out.println("Invalid input, please try again");
         scanner.nextLine();
       }
-
     }
+    scanner.close();
+  }
+
+  /**
+   * Display the menu.
+   */
+  private void displayMenu() {
+    String choices = """
+        
+        1: Add ingredient
+        2: Remove ingredient
+        3: Show all ingredients
+        4: Expired goods
+        5: Add recipe
+        6: Show recipe
+        7: Recommend dishes based on current ingredients
+        8: Exit
+        """;
+    System.out.println("What do you want to do?" + choices);
+  }
+
+  /**
+   * Handle the user's menu choice.
+   *
+   * @param choice the user's choice.
+   * @return true if the user should be prompted again, false if the program should exit.
+   */
+  private boolean handleMenuChoice(int choice) {
+    switch (choice) {
+      case ADD_INGREDIENT -> foodStorage.addIngredient(scanner);
+      case REMOVE_INGREDIENT ->
+        { System.out.println("Removing ingredient");
+          foodStorage.removeIngredient(scanner);
+        }
+      case SHOW_ALL_INGREDIENTS ->
+        {
+          System.out.println("Showing all ingredients");
+          foodStorage.clearIngredients(); // Clear the ingredients
+          foodStorage.loadIngredientsFromFile("ingredients.txt");
+        }
+      case EXPIRED_GOODS ->
+        {
+          System.out.println("Food storage: ");
+          foodStorage.expiredGoods();
+        }
+      case ADD_RECIPE ->
+        {
+          System.out.println("Add recipes to the cooking book:");
+          cookBook.addRecipe(scanner);
+        }
+      case SHOW_RECIPE ->
+        {
+        System.out.println("Showing recipes");
+        cookBook.showRecipe("recipes.txt");
+        }
+      case RECOMMEND_DISHES ->
+        {
+        System.out.println("Recommend dishes based on these current ingredients: \n");
+        cookBook.suggestRecipes(foodStorage, "recipes.txt");
+        }
+      case EXIT ->
+        {
+        System.out.println("Exiting");
+        return false;
+        }
+      default -> System.out.println("Invalid choice");
+    }
+    return true;
   }
 }
