@@ -29,25 +29,22 @@ https://github.com/NTNU-IDI/idatt1003-mappe-2024-Viet-Uy
 
 # How to run the project
 
-### Build the Project👷🏽‍♂️:
+### Open the Project💪🏽:  
+- Launch IntelliJ IDEA.
+- Open your project by selecting File > Open and navigating to your project's root directory.
+  
+### Ensure Maven is Configured:  
+- IntelliJ IDEA should automatically detect the pom.xml file and configure the project as a Maven project.
+- If not, right-click on the pom.xml file and select Add as Maven Project.
 
-Use Maven to build the project. Run the following command in the terminal:
-mvn clean install
+### Build the Project👷🏽‍♂️:  
+- Open the Maven tool window by selecting View > Tool Windows > Maven.
+- In the Maven tool window, expand the project and navigate to Lifecycle.
+- Double-click on clean and then install to build the project.
 
-### Run the Project🏃🏽:  
-- The main class of the project is edu.ntnu.idi.bidata.Main.
-- You can run the project using the following command:
-  mvn exec:java -Dexec.mainClass="edu.ntnu.idi.bidata.Main"
-
-### Main Class and Method🧠:  
-- The main class is edu.ntnu.idi.bidata.Main.
-- The main method is the entry point of the program:
-
-public class Main {
-  public static void main(String[] args) {
-    // Your code to start the application
-  }
-}
+### Run the Application🏃🏽:  
+- Locate the main class of your application (the class containing the main method).
+- Right-click on the main class file and select Run 'MainClass'.
 
 ### Input and Output✏️:  
 - Input: The program reads recipes from a file. The file should contain recipes formatted with the recipe name, ingredients, instructions, and the number of people it serves.
@@ -59,16 +56,13 @@ public class Main {
 - The program should log any errors encountered during file operations.
 - The recipes should be displayed or saved with proper formatting, ensuring readability.
 
-
 # How to run the tests🏃🏽
 
-### Build the Project:  
-- Use Maven to build the project. Run the following command in the terminal:
-  mvn clean install
-
-### Run the Tests:  
-- Use Maven to run the tests. Execute the following command:
-  mvn test
+- To run your tests, you can use the Maven tool window. Ensure maven is installed as a plugin in IntelliJ.
+  In the Maven tool window, navigate to Lifecycle and double-click on test.
+  
+### Run Specific Test:  
+- To run a specific test, right-click on the test class or method in the FoodStorageTest.java file and select Run 'FoodStorageTest'.
 
 # References 🔗
 
