@@ -26,6 +26,7 @@ public String toString() {
         .append("\n");
     sb.append("Number of people: ").append(numberOfPeople)
         .append("\n");
+    sb.append("\n");
     return sb.toString();
   }
 

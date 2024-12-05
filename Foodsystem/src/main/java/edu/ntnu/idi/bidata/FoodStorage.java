@@ -360,7 +360,7 @@ public class FoodStorage {
    */
 
   public IngredientInfo getIngredients(String name) {
-    return ingredients.stream()
+    return ingredients.stream() //Stream of ingredients
             .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
             .findFirst()
             .map(ingredient -> new IngredientInfo(ingredient.getName(),
@@ -379,8 +379,10 @@ public class FoodStorage {
           "Unit", "Price", "Expiration Date");
       System.out.println("-----------------------------------------------"
           + "---------------------------------------");
-      String coloredText = "\"%-20s %-20d %-10s %-10.2f \" + Red + \"%-15s\" + Reset + \"%n\"";
-      ingredients.stream()
+      String red = "\u001B[31m";
+      String reset = "\u001B[0m";
+      String coloredText = "%-20s %-20d %-10s %-10.2f " + red + "%-15s" + reset + "%n";
+      ingredients.stream() //Stream of ingredients
               .filter(ingredient -> ingredient.getExpirationDate().isBefore(LocalDate.now()))
               .forEach(ingredient -> System.out.printf(coloredText,
                       ingredient.getName(),

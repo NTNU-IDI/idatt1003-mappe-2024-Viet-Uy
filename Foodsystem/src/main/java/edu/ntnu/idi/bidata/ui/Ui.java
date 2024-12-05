@@ -11,6 +11,7 @@ import java.util.Scanner;
  * Console user interface for the food system.
  */
 public class Ui {
+  // Menu choices
   private static final int ADD_INGREDIENT = 1;
   private static final int REMOVE_INGREDIENT = 2;
   private static final int SHOW_ALL_INGREDIENTS = 3;
@@ -104,7 +105,7 @@ public class Ui {
         }
       case SHOW_RECIPE ->
         {
-        System.out.println("Showing recipes");
+        System.out.println("Showing recipes: \n");
         cookBook.showRecipe("recipes.txt");
         }
       case RECOMMEND_DISHES ->

@@ -34,6 +34,7 @@ public class RecipeManager {
    */
   public void addRecipe(Scanner scanner, HashMap<String, IngredientInfo> ingredients,
                         String instructions) {
+    // Create a new recipe
     ArrayList<IngredientInfo> ingredientList = new ArrayList<>(ingredients.values());
     boolean checker = true;
 
@@ -132,6 +133,7 @@ public class RecipeManager {
       System.out.println("Invalid number of people. Please enter a valid integer.");
       return;
     }
+    // Save the recipe to the recipe manager
     String filePath = FileHandler.getResourcePath("recipes.txt");
     Recipe recipe = new Recipe(recipeName, recipeInstructions, ingredientList, numberOfPeople);
     recipes.put(recipeName, recipe);
@@ -148,6 +150,7 @@ public class RecipeManager {
       System.err.println("Could not find the file: " + filename);
       return;
     }
+    // Read the content of the file
     String content = FileHandler.readFromFile(filePath);
     System.out.println(content);
   }
@@ -162,7 +165,7 @@ public class RecipeManager {
     try {
       foodStorage.loadIngredientsFromFile("ingredients.txt");
       loadRecipesFromFile(filename);
-
+      // Check which recipes can be made with the available ingredients
       ArrayList<Recipe> suggestedRecipes = new ArrayList<>();
       System.out.println("Number of recipes: " + recipes.size() + "\n");
 
@@ -189,7 +192,7 @@ public class RecipeManager {
           System.out.println("\n");
         }
       }
-
+      // Print the suggested recipes
       if (suggestedRecipes.isEmpty()) {
         System.out.println("No recipes can be made with the available ingredients.");
       } else {
@@ -222,6 +225,7 @@ public class RecipeManager {
           "Recipe Name: (.+)|Ingredient: (.+), Amount: (\\d+) (.+), Price: (\\d+\\.\\d+)|"
               + "Instructions: (.+)|Number of people: (\\d+)");
 
+      // Read the content of the file
       while ((line = reader.readLine()) != null) {
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
