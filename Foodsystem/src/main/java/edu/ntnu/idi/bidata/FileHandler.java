@@ -30,10 +30,10 @@ public class FileHandler {
    */
   public static String getResourcePath(String filename) {
     // Get the URL of the resource file
+
     URL resourceUrl = FileHandler.class.getClassLoader().getResource(filename);
     if (resourceUrl == null) {
-      logger.log(Level.SEVERE, "Resource file not found: {0}", filename);
-      return null;
+      throw new IllegalArgumentException("File not found: " + filename);
     }
     return resourceUrl.getPath();
   }

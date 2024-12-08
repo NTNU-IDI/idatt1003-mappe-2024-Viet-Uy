@@ -2,6 +2,7 @@ package edu.ntnu.idi.bidata.ui;
 
 import edu.ntnu.idi.bidata.CookBook;
 import edu.ntnu.idi.bidata.FoodStorage;
+import edu.ntnu.idi.bidata.exceptions.RecipeNotFound;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -106,7 +107,12 @@ public class Ui {
       case SHOW_RECIPE ->
         {
         System.out.println("Showing recipes: \n");
-        cookBook.showRecipe("recipes.txt");
+        try {
+          cookBook.showRecipe("recipes.txt");
+        } catch (RecipeNotFound recipeNotFound) {
+          System.out.println(recipeNotFound.getMessage() + "\n");
+        }
+
         }
       case RECOMMEND_DISHES ->
         {

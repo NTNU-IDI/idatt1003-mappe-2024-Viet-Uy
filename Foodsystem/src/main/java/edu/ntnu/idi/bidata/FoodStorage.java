@@ -35,10 +35,6 @@ public class FoodStorage {
 
   }
 
-  public List<Ingredient> getIngredientsList() {
-    return new ArrayList<>(ingredients); // Return a copy to avoid modification outside the class
-  }
-
   /**
    * Checks if an ingredient exists in the list of ingredients. Used for testing purposes.
    *
@@ -293,8 +289,8 @@ public class FoodStorage {
       return;
     }
     String resourcePath = resourceUrl.getPath(); //Getting the path of the file
-
     String filePath = resourcePath + filename; //Creating a new file path
+
     try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
       writer.println(ingredient.toString()); //Writing the ingredient to the file
     } catch (IOException e) {

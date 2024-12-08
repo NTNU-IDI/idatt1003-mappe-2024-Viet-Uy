@@ -1,8 +1,10 @@
 package edu.ntnu.idi.bidata;
 
+import edu.ntnu.idi.bidata.exceptions.RecipeNotFound;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -34,6 +36,7 @@ public class RecipeManager {
    */
   public void addRecipe(Scanner scanner, HashMap<String, IngredientInfo> ingredients,
                         String instructions) {
+
     // Create a new recipe
     ArrayList<IngredientInfo> ingredientList = new ArrayList<>(ingredients.values());
     boolean checker = true;
@@ -133,8 +136,19 @@ public class RecipeManager {
       System.out.println("Invalid number of people. Please enter a valid integer.");
       return;
     }
+
+    URL resourceUrl = getClass().getClassLoader().getResource(""); // Getting the resource path
+
+    if (resourceUrl == null) {
+      logger.log(Level.SEVERE, "Resource path is null"); // Logging the error
+      return;
+    }
+
+    String resourcePath = resourceUrl.getPath(); // Getting the path of the file
+    String filePath = resourcePath + "recipes.txt"; // Creating a new file path
+
+
     // Save the recipe to the recipe manager
-    String filePath = FileHandler.getResourcePath("recipes.txt");
     Recipe recipe = new Recipe(recipeName, recipeInstructions, ingredientList, numberOfPeople);
     recipes.put(recipeName, recipe);
     FileHandler.writeToFile(filePath, recipe.toString());
@@ -145,10 +159,14 @@ public class RecipeManager {
    * Show all recipes in the recipe manager.
    */
   public void showRecipe(String filename) {
-    String filePath = FileHandler.getResourcePath(filename);
+    String filePath;
+    try {
+      filePath = FileHandler.getResourcePath(filename);
+    } catch (Exception e) {
+      throw new RecipeNotFound("No recipes made yet");
+    }
     if (filePath == null) {
-      System.err.println("Could not find the file: " + filename);
-      return;
+      throw new RecipeNotFound("No recipes made yet");
     }
     // Read the content of the file
     String content = FileHandler.readFromFile(filePath);
