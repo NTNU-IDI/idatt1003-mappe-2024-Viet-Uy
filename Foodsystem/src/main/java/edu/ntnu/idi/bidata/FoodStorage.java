@@ -1,7 +1,6 @@
 package edu.ntnu.idi.bidata;
 
 import edu.ntnu.idi.bidata.exceptions.IngredientNotFound;
-import edu.ntnu.idi.bidata.exceptions.RecipeNotFound;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -290,8 +289,8 @@ public class FoodStorage {
       logger.log(Level.SEVERE, "Resource path is null"); //Logging the error
       return;
     }
-    String resourcePath = resourceUrl.getPath(); //Getting the path of the file
-    String filePath = resourcePath + filename; //Creating a new file path
+
+    String filePath = FileHandler.getResourcePath(filename);
 
     try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
       writer.println(ingredient.toString()); //Writing the ingredient to the file
