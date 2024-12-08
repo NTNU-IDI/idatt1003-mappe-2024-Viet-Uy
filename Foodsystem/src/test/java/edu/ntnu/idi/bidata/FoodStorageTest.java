@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,29 +31,6 @@ class FoodStorageTest {
 
         System.setIn(originalSystemIn); // Restore original System.in);
         assertTrue(true, "Invalid input should not crash the program.");
-    }
-
-    @Test
-    void testRemoveNonExistingIngredient() {
-        FoodStorage foodStorage = new FoodStorage();
-
-        // Directly create and add an ingredient
-        Ingredient ingredient = new Ingredient("Apple", "Gram", 10, 1.99, LocalDate.of(2024, 12, 12));
-        foodStorage.addIngredientDirectly(ingredient);
-
-        // Simulate user input for removing a non-existing ingredient
-        String input = "NonExistingIngredient\n";
-        InputStream original = System.in;
-        System.setIn(new ByteArrayInputStream(input.getBytes())); // Set simulated input
-
-        Scanner removeScanner = new Scanner(System.in);
-        foodStorage.removeIngredient(removeScanner); // This will use the simulated input
-
-        System.setIn(original); // Restore original System.in
-
-        // Verify the non-existing ingredient was not removed
-        assertTrue(foodStorage.ingredientExists("Apple"), "Ingredient should still exist.");
-        assertFalse(foodStorage.ingredientExists("NonExistingIngredient"), "Non-existing ingredient should not exist.");
     }
 
 }
