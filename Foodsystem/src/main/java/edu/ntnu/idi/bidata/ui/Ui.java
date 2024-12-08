@@ -2,6 +2,7 @@ package edu.ntnu.idi.bidata.ui;
 
 import edu.ntnu.idi.bidata.CookBook;
 import edu.ntnu.idi.bidata.FoodStorage;
+import edu.ntnu.idi.bidata.exceptions.IngredientNotFound;
 import edu.ntnu.idi.bidata.exceptions.RecipeNotFound;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -85,19 +86,32 @@ public class Ui {
     switch (choice) {
       case ADD_INGREDIENT -> foodStorage.addIngredient(scanner);
       case REMOVE_INGREDIENT ->
-        { System.out.println("Removing ingredient");
-          foodStorage.removeIngredient(scanner);
+        {
+          System.out.println("Removing ingredient");
+          try {
+            foodStorage.removeIngredient(scanner);
+          } catch (IngredientNotFound ingredientNotFound) {
+            System.out.println(ingredientNotFound.getMessage() + "\n");
+          }
         }
       case SHOW_ALL_INGREDIENTS ->
         {
           System.out.println("Showing all ingredients");
           foodStorage.clearIngredients(); // Clear the ingredients
-          foodStorage.loadIngredientsFromFile("ingredients.txt");
+          try {
+            foodStorage.loadIngredientsFromFile("ingredients.txt");
+          } catch (IngredientNotFound ingredientNotFound) {
+            System.out.println(ingredientNotFound.getMessage() + "\n");
+          }
         }
       case EXPIRED_GOODS ->
         {
           System.out.println("Food storage: ");
-          foodStorage.expiredGoods();
+          try {
+            foodStorage.expiredGoods();
+          } catch (IngredientNotFound ingredientNotFound) {
+            System.out.println(ingredientNotFound.getMessage() + "\n");
+          }
         }
       case ADD_RECIPE ->
         {
@@ -117,7 +131,13 @@ public class Ui {
       case RECOMMEND_DISHES ->
         {
         System.out.println("Recommend dishes based on these current ingredients: \n");
-        cookBook.suggestRecipes(foodStorage, "recipes.txt");
+
+          try {
+            cookBook.suggestRecipes(foodStorage, "recipes.txt");
+          } catch (RecipeNotFound recipeNotFound) {
+            System.out.println(recipeNotFound.getMessage() + "\n");
+          }
+
         }
       case EXIT ->
         {

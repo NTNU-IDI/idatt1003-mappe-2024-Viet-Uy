@@ -1,5 +1,7 @@
 package edu.ntnu.idi.bidata;
 
+import edu.ntnu.idi.bidata.exceptions.IngredientNotFound;
+import edu.ntnu.idi.bidata.exceptions.RecipeNotFound;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -305,13 +307,15 @@ public class FoodStorage {
    */
   public void loadIngredientsFromFile(String filename) {
     ingredients.clear();
-    URL resourceUrl = getClass().getClassLoader().getResource(filename);
-
-    if (resourceUrl == null) {
-      System.err.println("Resource path is null");
-      return;
+    String filePath;
+    try {
+      filePath = FileHandler.getResourcePath(filename);
+    } catch (Exception e) {
+      throw new IngredientNotFound("No ingredients added yet");
     }
-    String filePath = resourceUrl.getPath();
+    if (filePath == null) {
+      throw new IngredientNotFound("No ingredients added yet");
+    }
 
     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
       String regex = "Ingredient\\{name='(.+)', unit='(.+)', numberOfUnits=(\\d+), "
@@ -389,7 +393,7 @@ public class FoodStorage {
       System.out.println("-----------------------------------------------"
               + "---------------------------------------\n");
     } catch (Exception e) {
-      logger.log(Level.SEVERE, "Error while checking expired goods", e);
+      throw new IngredientNotFound("No ingredients added yet");
     }
   }
 

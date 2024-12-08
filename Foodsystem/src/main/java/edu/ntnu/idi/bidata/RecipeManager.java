@@ -221,7 +221,7 @@ public class RecipeManager {
       }
 
     } catch (Exception e) {
-      logger.log(Level.SEVERE, "An error occurred while suggesting recipes", e);
+      throw new RecipeNotFound("No recipes added yet");
     }
   }
 
