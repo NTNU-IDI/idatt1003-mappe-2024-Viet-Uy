@@ -333,7 +333,7 @@ public class FoodStorage {
               ))
               .toList());
     } catch (IOException e) {
-      System.err.println("Could not read ingredients from file: " + e.getMessage());
+      throw new IngredientNotFound("No ingredients added yet");
     }
 
     ingredients.sort(Comparator.comparing(Ingredient::getName));
