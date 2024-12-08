@@ -40,7 +40,7 @@ https://github.com/NTNU-IDI/idatt1003-mappe-2024-Viet-Uy
 ### Build the Project👷🏽‍♂️:  
 - Open the Maven tool window by selecting View > Tool Windows > Maven.
 - In the Maven tool window, expand the project and navigate to Lifecycle.
-- Double-click on clean and then install to build the project.
+- Double-click on clean, compile and then install to build the project.
 
 ### Run the Application🏃🏽:  
 - Locate the main class of your application (the class containing the main method).
