@@ -1,11 +1,13 @@
 package edu.ntnu.idi.bidata;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,11 +31,20 @@ public class FileHandler {
    * @return the path of the file.
    */
   public static String getResourcePath(String filename) {
-    // Get the URL of the resource file
-
     URL resourceUrl = FileHandler.class.getClassLoader().getResource(filename);
     if (resourceUrl == null) {
-      throw new IllegalArgumentException("File not found: " + filename);
+      try {
+        String resourcePath = Objects.requireNonNull(
+            FileHandler.class.getClassLoader().getResource("")).getPath();
+        File newFile = new File(resourcePath, filename);
+        if (newFile.createNewFile()) {
+          return newFile.getPath();
+        } else {
+          throw new IOException("File already exists: " + filename);
+        }
+      } catch (IOException e) {
+        throw new IllegalArgumentException("Error");
+      }
     }
     return resourceUrl.getPath();
   }
