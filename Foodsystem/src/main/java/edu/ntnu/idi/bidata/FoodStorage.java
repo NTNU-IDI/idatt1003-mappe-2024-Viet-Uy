@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -79,8 +81,8 @@ public class FoodStorage {
           case "3" -> "Pieces";
           default ->
             {
-            System.out.println("Invalid choice. Please enter 1, 2, or 3.");
-            yield null;
+              System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+              yield null;
             }
         };
 
@@ -165,7 +167,7 @@ public class FoodStorage {
       return;
     }
 
-    String filePath = resourceUrl.getPath(); //Getting the path of the file
+    String filePath = FileHandler.getResourcePath("ingredients.txt"); //Getting the path of the file
 
     try (BufferedReader br = new BufferedReader(new FileReader(filePath))) { //Reading the file
       String line;
@@ -213,14 +215,8 @@ public class FoodStorage {
    */
   private void removeLineFromFile(String lineToRemove, int unitsToRemove) {
 
-    String tempFile = "temp.txt";
-    //Getting the resource path:
-    URL resourceUrl = getClass().getClassLoader().getResource("ingredients.txt");
-    if (resourceUrl == null) {
-      logger.log(Level.SEVERE, "Resource path is null");
-      return;
-    }
-    String resourcePath = resourceUrl.getPath();  //Getting the path of the file
+    String tempFile = "temp.txt"; //Creating a new file
+    String resourcePath = FileHandler.getResourcePath("ingredients.txt");
     File oldFile = new File(resourcePath); //Creating a new file
     File newFile = new File(oldFile.getParent(), tempFile); //Creating a new file
 
@@ -244,16 +240,14 @@ public class FoodStorage {
                 int newNumberOfUnits = numberOfUnits - unitsToRemove;
                 //Replacing the number of units with the new number of units:
                 currentLine = currentLine.replace("numberOfUnits=" + numberOfUnits,
-      "numberOfUnits=" + newNumberOfUnits);
+                    "numberOfUnits=" + newNumberOfUnits);
               }
-            } else {
-              continue;
             }
           }
         }
         pw.println(currentLine); //Printing the line
       }
-    } catch (IOException e) { 
+    } catch (IOException e) {
       logger.log(Level.SEVERE, "Error processing file", e);
       return;
     }
@@ -284,14 +278,13 @@ public class FoodStorage {
    */
   public void saveIngredientsToFile(String filename, Ingredient ingredient) {
     URL resourceUrl = getClass().getClassLoader().getResource(""); //Getting the resource path
-
     if (resourceUrl == null) {
       logger.log(Level.SEVERE, "Resource path is null"); //Logging the error
       return;
     }
 
-    String filePath = FileHandler.getResourcePath(filename);
-
+    String decodedPath = URLDecoder.decode(resourceUrl.getPath(), StandardCharsets.UTF_8);
+    String filePath = decodedPath + filename;
     try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
       writer.println(ingredient.toString()); //Writing the ingredient to the file
     } catch (IOException e) {
@@ -307,30 +300,29 @@ public class FoodStorage {
   public void loadIngredientsFromFile(String filename) {
     ingredients.clear();
     String filePath;
+    String decodedPath;
     try {
       filePath = FileHandler.getResourcePath(filename);
+      decodedPath = URLDecoder.decode(filePath, StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new IngredientNotFound("No ingredients added yet");
     }
-    if (filePath == null) {
-      throw new IngredientNotFound("No ingredients added yet");
-    }
 
-    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(decodedPath))) {
       String regex = "Ingredient\\{name='(.+)', unit='(.+)', numberOfUnits=(\\d+), "
-              + "price=(\\d+\\.\\d+), expirationDate=(\\d{4}-\\d{2}-\\d{2})}";
+          + "price=(\\d+\\.\\d+), expirationDate=(\\d{4}-\\d{2}-\\d{2})}";
       Pattern pattern = Pattern.compile(regex);
       ingredients.addAll(reader.lines()
-              .map(pattern::matcher)
-              .filter(Matcher::matches)
-              .map(matcher -> new Ingredient(
-                      matcher.group(1),
-                      matcher.group(2),
-                      Integer.parseInt(matcher.group(3)),
-                      Double.parseDouble(matcher.group(4)),
-                      LocalDate.parse(matcher.group(5))
-              ))
-              .toList());
+          .map(pattern::matcher)
+          .filter(Matcher::matches)
+          .map(matcher -> new Ingredient(
+              matcher.group(1),
+              matcher.group(2),
+              Integer.parseInt(matcher.group(3)),
+              Double.parseDouble(matcher.group(4)),
+              LocalDate.parse(matcher.group(5))
+          ))
+          .toList());
     } catch (IOException e) {
       throw new IngredientNotFound("No ingredients added yet");
     }
@@ -342,13 +334,13 @@ public class FoodStorage {
     System.out.println("-----------------------------------------------"
         + "---------------------------------------");
     ingredients.forEach(ingredient -> System.out.printf("%-20s %-20d %-10s %-10.2f %-15s%n",
-            ingredient.getName(),
-            ingredient.getNumberOfItems(),
-            ingredient.getUnit(),
-            ingredient.getPrice(),
-            ingredient.getExpirationDate()));
+        ingredient.getName(),
+        ingredient.getNumberOfItems(),
+        ingredient.getUnit(),
+        ingredient.getPrice(),
+        ingredient.getExpirationDate()));
     System.out.println("-----------------------------------------------"
-            + "---------------------------------------\n");
+        + "---------------------------------------\n");
   }
 
   /**
@@ -360,11 +352,11 @@ public class FoodStorage {
 
   public IngredientInfo getIngredients(String name) {
     return ingredients.stream() //Stream of ingredients
-            .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
-            .findFirst()
-            .map(ingredient -> new IngredientInfo(ingredient.getName(),
-                    ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()))
-            .orElse(null);
+        .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
+        .findFirst()
+        .map(ingredient -> new IngredientInfo(ingredient.getName(),
+            ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()))
+        .orElse(null);
   }
 
   /**
@@ -382,15 +374,15 @@ public class FoodStorage {
       String reset = "\u001B[0m";
       String coloredText = "%-20s %-20d %-10s %-10.2f " + red + "%-15s" + reset + "%n";
       ingredients.stream() //Stream of ingredients
-              .filter(ingredient -> ingredient.getExpirationDate().isBefore(LocalDate.now()))
-              .forEach(ingredient -> System.out.printf(coloredText,
-                      ingredient.getName(),
-                      ingredient.getNumberOfItems(),
-                      ingredient.getUnit(),
-                      ingredient.getPrice(),
-                      ingredient.getExpirationDate()));
+          .filter(ingredient -> ingredient.getExpirationDate().isBefore(LocalDate.now()))
+          .forEach(ingredient -> System.out.printf(coloredText,
+              ingredient.getName(),
+              ingredient.getNumberOfItems(),
+              ingredient.getUnit(),
+              ingredient.getPrice(),
+              ingredient.getExpirationDate()));
       System.out.println("-----------------------------------------------"
-              + "---------------------------------------\n");
+          + "---------------------------------------\n");
     } catch (Exception e) {
       throw new IngredientNotFound("No ingredients added yet");
     }
@@ -404,3 +396,4 @@ public class FoodStorage {
   }
 
 }
+
