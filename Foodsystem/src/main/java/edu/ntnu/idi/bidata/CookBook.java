@@ -1,7 +1,6 @@
 package edu.ntnu.idi.bidata;
 
 import java.util.HashMap;
-import java.util.Scanner;
 
 /**
  * A class to represent a cookbook.
@@ -9,42 +8,24 @@ import java.util.Scanner;
 public class CookBook {
   private final RecipeManager recipeManager;
   private final String name;
-  private final HashMap<String, IngredientInfo> ingredients;
-  private final String instructions;
-
 
   /**
-   * Create a new CookBook.
+   * Create a new cookbook.
    *
    * @param name         the name of the cookbook.
-   * @param ingredients  the ingredients available in the cookbook.
-   * @param instructions the instructions for the cookbook.
+   * @param recipes      the recipes in the cookbook.
    */
-  public CookBook(String name, HashMap<String, IngredientInfo> ingredients, String instructions) {
+  public CookBook(String name, HashMap<String, Recipe> recipes) {
     this.recipeManager = new RecipeManager();
     this.name = name;
-    this.ingredients = ingredients;
-    this.instructions = instructions;
+  }
+
+  public RecipeManager getRecipeManager() {
+    return recipeManager;
   }
 
   public String getName() {
     return name;
-  }
-
-  /**
-   * Add a recipe to the cookbook.
-   *
-   * @param scanner the scanner to read input from the user.
-   */
-  public void addRecipe(Scanner scanner) {
-    recipeManager.addRecipe(scanner, ingredients, instructions);
-  }
-
-  /**
-   * Show all recipes in the cookbook.
-   */
-  public void showRecipe(String filename) {
-    recipeManager.showRecipe(filename);
   }
 
   /**

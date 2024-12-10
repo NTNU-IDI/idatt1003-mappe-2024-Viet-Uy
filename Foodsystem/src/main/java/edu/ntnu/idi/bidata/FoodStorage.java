@@ -11,11 +11,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -39,6 +37,32 @@ public class FoodStorage {
   }
 
   /**
+   * Gets the list of ingredients.
+   *
+   * @return the list of ingredients.
+   */
+
+  public List<Ingredient> getIngredients() {
+    return ingredients;
+  }
+
+  /**
+   * Gets the ingredient by name. This the function used to get the ingredient info. in the menu.
+   *
+   * @param name the name of the ingredient.
+   * @return the ingredient info.
+   */
+
+  public IngredientInfo getIngredients(String name) {
+    return ingredients.stream() //Stream of ingredients
+        .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
+        .findFirst()
+        .map(ingredient -> new IngredientInfo(ingredient.getName(),
+            ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()))
+        .orElse(null);
+  }
+
+  /**
    * Checks if an ingredient exists in the list of ingredients. Used for testing purposes.
    *
    * @param name the name of the ingredient.
@@ -57,154 +81,75 @@ public class FoodStorage {
     ingredients.add(ingredient);
   }
 
+
   /**
    * Adds ingredients to the list of ingredients.
    *
-   * @param scanner the scanner object to read input from the user.
+   * @param name the name of the ingredient.
+   * @param unit the unit of the ingredient.
+   * @param numberOfUnits the number of units of the ingredient.
+   * @param price the price of the ingredient.
+   * @param expirationDate the expiration date of the ingredient.
+   * @return true if the ingredient is added successfully, false otherwise.
    */
-  public void addIngredient(Scanner scanner) {
-    boolean loop = true;
-    while (loop) {
-      try {
-        System.out.println("Whats your ingredient name?");
-        final String name = scanner.nextLine().trim();
-        if (name.isEmpty()) {
-          System.out.println("Ingredient name cannot be empty.");
-          continue;
-        }
-
-        System.out.println("What unit? \n 1. Gram \n 2. Liter \n 3. Pieces");
-        final String unitType = scanner.nextLine();
-        final String unit = switch (unitType) {
-          case "1" -> "Gram";
-          case "2" -> "Liter";
-          case "3" -> "Pieces";
-          default ->
-            {
-              System.out.println("Invalid choice. Please enter 1, 2, or 3.");
-              yield null;
-            }
-        };
-
-        if (unit == null) {
-          continue;
-        }
-
-        System.out.println("How many " + unit + " do you have?");
-        int numberOfUnits;
-        try {
-          numberOfUnits = Integer.parseInt(scanner.nextLine().trim());
-          if (numberOfUnits <= 0) {
-            System.out.println("Number of units must be a positive integer.");
-            continue;
-          }
-        } catch (NumberFormatException e) {
-          System.out.println("Invalid number of units. Please enter a valid integer.");
-          continue;
-        }
-
-        System.out.println("What price? Just the number");
-        String priceInput = scanner.nextLine().replace(',', '.');
-        double price;
-        try {
-          price = Double.parseDouble(priceInput);
-          if (price <= 0) {
-            System.out.println("Price must be a positive number.");
-            continue;
-          }
-        } catch (NumberFormatException e) {
-          System.out.println("Invalid price. Please enter a valid number.");
-          return;
-        }
-
-        System.out.println("What is the expiration date? (YYYY-MM-DD)");
-        final String dateInput = scanner.nextLine().trim();
-        LocalDate expirationDate;
-        try {
-          expirationDate = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
-        } catch (Exception e) {
-          System.out.println("Invalid date format. Please enter a date in the format YYYY-MM-DD.");
-          continue;
-        }
-
-        Ingredient ingredient = new Ingredient(name, unit, numberOfUnits, price, expirationDate);
-        ingredients.add(ingredient);
-        saveIngredientsToFile("ingredients.txt", ingredient);
-        System.out.println("Ingredient added successfully!");
-        loop = false;
-      } catch (Exception e) {
-        System.out.println("An error occurred while adding the ingredient: " + e.getMessage());
-      }
+  public boolean addIngredient(String name, String unit, int numberOfUnits, double price,
+                               LocalDate expirationDate) {
+    // Validate the input parameters
+    if (name.isEmpty() || unit == null || numberOfUnits <= 0 || price <= 0
+        || expirationDate == null) {
+      return false; // Return false if any validation fails
     }
 
+    // Create a new ingredient and add it to the list
+    Ingredient ingredient = new Ingredient(name, unit, numberOfUnits, price, expirationDate);
+    ingredients.add(ingredient);
+    saveIngredientsToFile("ingredients.txt", ingredient); // Save the ingredient to the file
+    return true; // Return true if the ingredient is added successfully
   }
 
   /**
    * Removes ingredients from the list of ingredients.
    */
-  public void removeIngredient(Scanner scanner) {
+  public boolean removeIngredient(String name, int unitsToRemove) {
     String filename = "ingredients.txt";
     String regex = "name='(.*?)'";
-    Pattern pattern = Pattern.compile(regex); //Compiling the pattern to be used in the matcher.
+    Pattern pattern = Pattern.compile(regex);
     FoodStorage foodStorage = new FoodStorage();
     foodStorage.loadIngredientsFromFile(filename);
-    System.out.println("Enter the name of the ingredient you want to remove: ");
-    String name = scanner.nextLine().trim();
 
     if (name.isEmpty()) {
-      System.out.println("Ingredient name cannot be empty.");
-      return;
+      return false;
     }
 
     if (!ingredientExists(name)) {
-      System.out.println("Ingredient not found.");
-      return;
+      return false;
     }
 
-    URL resourceUrl = getClass().getClassLoader().getResource(filename); //Getting the resource path
+    URL resourceUrl = getClass().getClassLoader().getResource(filename);
     if (resourceUrl == null) {
       logger.log(Level.SEVERE, "Resource path is null");
-      return;
+      return false;
     }
 
-    String filePath = FileHandler.getResourcePath("ingredients.txt"); //Getting the path of the file
+    String filePath = FileHandler.getResourcePath("ingredients.txt");
 
-    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) { //Reading the file
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
       String line;
       while ((line = br.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line); //Matching the pattern with the line
+        Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
-          String nameIngredient = matcher.group(1); //Getting the name of the ingredient
-          //Checking if the name is equal to the name of the ingredient:
+          String nameIngredient = matcher.group(1);
           if (nameIngredient.equalsIgnoreCase(name)) {
-            System.out.println("Do you want to remove this ingredient? (yes/no)");
-            String answer = scanner.nextLine().toLowerCase(); //Converting the input to lowercase
-            if (answer.equals("yes")) { //Checking if the input is yes
-              System.out.println("How many units do you want to remove? (0 to remove all)");
-              int unitsToRemove;
-              try {
-                unitsToRemove = Integer.parseInt(scanner.nextLine().trim());
-                if (unitsToRemove < 0) {
-                  System.out.println("Number of units must be a positive integer.");
-                  continue;
-                }
-              } catch (NumberFormatException e) {
-                System.out.println("Invalid number of units. Please enter a valid integer.");
-                continue;
-              }
-              removeLineFromFile(line, unitsToRemove);
-              System.out.println("Ingredient removed!");
-            } else if (answer.equals("no")) {
-              System.out.println("Ingredient not removed!");
-            } else {
-              System.out.println("Invalid input!");
-            }
+            removeLineFromFile(line, unitsToRemove);
+            return true;
           }
         }
       }
     } catch (IOException e) {
-      System.out.println("Error");
+      logger.log(Level.SEVERE, "Error processing file", e);
+      return false;
     }
+    return false;
   }
 
   /**
@@ -328,64 +273,18 @@ public class FoodStorage {
     }
 
     ingredients.sort(Comparator.comparing(Ingredient::getName));
-
-    System.out.printf("%-20s %-20s %-10s %-10s %-15s%n", "Name", "Number of Units",
-        "Unit", "Price", "Expiration Date");
-    System.out.println("-----------------------------------------------"
-        + "---------------------------------------");
-    ingredients.forEach(ingredient -> System.out.printf("%-20s %-20d %-10s %-10.2f %-15s%n",
-        ingredient.getName(),
-        ingredient.getNumberOfItems(),
-        ingredient.getUnit(),
-        ingredient.getPrice(),
-        ingredient.getExpirationDate()));
-    System.out.println("-----------------------------------------------"
-        + "---------------------------------------\n");
   }
 
-  /**
-   * Gets the ingredient by name. This the function used to get the ingredient info. in the menu.
-   *
-   * @param name the name of the ingredient.
-   * @return the ingredient info.
-   */
 
-  public IngredientInfo getIngredients(String name) {
-    return ingredients.stream() //Stream of ingredients
-        .filter(ingredient -> ingredient.getName().equalsIgnoreCase(name))
-        .findFirst()
-        .map(ingredient -> new IngredientInfo(ingredient.getName(),
-            ingredient.getNumberOfItems(), ingredient.getUnit(), ingredient.getPrice()))
-        .orElse(null);
-  }
 
   /**
    * Prints out the ingredients that are expired.
    */
-  public void expiredGoods() {
-    try {
-      loadIngredientsFromFile("ingredients.txt"); // Loading the ingredients from the file
-      System.out.println("Expired goods: ");
-      System.out.printf("%-20s %-20s %-10s %-10s %-15s%n", "Name", "Number of Units",
-          "Unit", "Price", "Expiration Date");
-      System.out.println("-----------------------------------------------"
-          + "---------------------------------------");
-      String red = "\u001B[31m";
-      String reset = "\u001B[0m";
-      String coloredText = "%-20s %-20d %-10s %-10.2f " + red + "%-15s" + reset + "%n";
-      ingredients.stream() //Stream of ingredients
-          .filter(ingredient -> ingredient.getExpirationDate().isBefore(LocalDate.now()))
-          .forEach(ingredient -> System.out.printf(coloredText,
-              ingredient.getName(),
-              ingredient.getNumberOfItems(),
-              ingredient.getUnit(),
-              ingredient.getPrice(),
-              ingredient.getExpirationDate()));
-      System.out.println("-----------------------------------------------"
-          + "---------------------------------------\n");
-    } catch (Exception e) {
-      throw new IngredientNotFound("No ingredients added yet");
-    }
+  public List<Ingredient> getExpiredGoods() {
+    loadIngredientsFromFile("ingredients.txt"); // Loading the ingredients from the file
+    return ingredients.stream()
+        .filter(ingredient -> ingredient.getExpirationDate().isBefore(LocalDate.now()))
+        .toList();
   }
 
   /**

@@ -3,6 +3,7 @@ package edu.ntnu.idi.bidata;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,15 +46,15 @@ class CookBookTest {
         private final HashMap<String, IngredientInfo> mockIngredients = new HashMap<>();
 
 
-        @Override
-        public void addIngredient(Scanner scanner) {
-            String name = scanner.nextLine();
-            int amount = scanner.nextInt();
-            double price = scanner.nextDouble();
-            scanner.nextLine(); // consume the newline
-            mockIngredients.put(name, new IngredientInfo(name, amount, "unit", price));
-            System.out.println("Mock add ingredient: " + name + ", Amount: " + amount + ", Price: " + price);
+      @Override
+      public boolean addIngredient(String name, String unit, int numberOfUnits, double price, LocalDate expirationDate) {
+        if (name.isEmpty() || unit == null || numberOfUnits <= 0 || price <= 0 || expirationDate == null) {
+          return false;
         }
+        mockIngredients.put(name, new IngredientInfo(name, numberOfUnits, unit, price));
+        System.out.println("Mock add ingredient: " + name + ", Amount: " + numberOfUnits + ", Price: " + price);
+        return true;
+      }
 
 
         public boolean containsIngredient(String name) {
