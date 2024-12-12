@@ -1,6 +1,6 @@
 # Portfolio project IDATT1003
 
-STUDENT NAME = "Viet-Uy"  
+STUDENT NAME = "Viet-Uy Do"  
 STUDENT ID = "137422"
 
 # Project description
