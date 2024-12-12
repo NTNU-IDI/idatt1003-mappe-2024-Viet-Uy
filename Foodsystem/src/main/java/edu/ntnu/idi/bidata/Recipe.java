@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Recipe class, this is where recipes are to be added and stored.
  */
 public record Recipe(String name, String instructions, ArrayList<IngredientInfo> ingredients,
-                     int numberOfPeople) {
+                     int servings) {
 
   @Override
 public String toString() {
@@ -24,7 +24,7 @@ public String toString() {
     }
     sb.append("Instructions: ").append(instructions)
         .append("\n");
-    sb.append("Number of people: ").append(numberOfPeople)
+    sb.append("Number of people: ").append(servings)
         .append("\n");
     sb.append("\n");
     return sb.toString();

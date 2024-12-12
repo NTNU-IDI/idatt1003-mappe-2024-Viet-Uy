@@ -10,7 +10,6 @@ import edu.ntnu.idi.bidata.exceptions.RecipeNotFound;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -41,7 +40,7 @@ public class Ui {
   public void init() {
     scanner = new Scanner(System.in); // Scanner to read input from the user
     foodStorage = new FoodStorage();
-    cookBook = new CookBook("MyCookBook", new HashMap<>());
+    cookBook = new CookBook("MyCookBook");
     System.out.println("Welcome to the Food Storage System!");
   }
 
