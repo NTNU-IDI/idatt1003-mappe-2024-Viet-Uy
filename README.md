@@ -3,6 +3,8 @@
 STUDENT NAME = "Viet-Uy Do"  
 STUDENT ID = "137422"
 
+#FINAL GRADE: B
+
 # Project description
 
 This project is a Java-based application developed using Maven, designed to help users efficiently manage their food ingredients and recipes🥕. Users can add new ingredients to the storage system, specify their quantities, and record expiration dates. The application tracks ingredient expiration and alerts users when items are close to expiring, helping to reduce food waste📅. Additionally, users can create and store recipes in a cookbook, associating them with specific ingredients🧑🏽‍🍳. The system can suggest recipes based on the ingredients currently available in the user's storage, making meal planning easier. This project utilizes Maven for dependency management and leverages Java’s robust libraries to deliver a user-friendly and efficient food storage and recipe management experience.
